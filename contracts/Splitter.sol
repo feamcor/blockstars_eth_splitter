@@ -64,8 +64,7 @@ contract Splitter {
   /// @notice Withdraw splitted funds from previous deposits.
   /// @dev Emits `FundsWithdrew` event.
   function withdraw() external payable {
-    require(enrolled[msg.sender], "member not enrolled");
-    require(balances[msg.sender] != uint(0), "no balance left");
+    require(balances[msg.sender] != uint(0), "not enrolled or no balance");
     uint _amount = balances[msg.sender];
     balances[msg.sender] = 0;
     msg.sender.transfer(_amount);
@@ -74,23 +73,25 @@ contract Splitter {
 
   /// @notice Return number of members enrolled in the group.
   /// @return number of members enrolled.
-  function getMembersLength() external view returns (uint length) {
+  function getMembersLength() public view returns (uint length) {
     return members.length;
   }
 
   /// @notice Return member details based on its order of enrollment.
   /// @param _index position of member (starting from zero) on list of members
-  /// @return address and balance of member
-  function getMemberDetailsByIndex(uint _index) external view returns (address member, uint balance) {
-    require(_index < members.length, "invalid member index");
-    return (members[_index], balances[members[_index]]);
+  /// @return address and balance of member or zeros if out of range
+  function getMemberDetailsByIndex(uint _index) public view returns (address member, uint balance) {
+    if(_index < members.length) {
+      return (members[_index], balances[members[_index]]);
+    } else {
+      return (address(0x0), uint(0));
+    }
   }
 
   /// @notice Return member balance according to its address.
   /// @param _member address of member
-  /// @return balance of member
-  function getMemberBalance(address _member) external view returns (uint balance) {
-    require(enrolled[_member], "member not found");
+  /// @return balance of member or zero if non-member
+  function getMemberBalance(address _member) public view returns (uint balance) {
     return balances[_member];
   }
 }
