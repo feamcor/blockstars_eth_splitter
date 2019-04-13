@@ -74,14 +74,14 @@ contract Splitter {
 
   /// @notice Return number of members enrolled in the group.
   /// @return number of members enrolled.
-  function getMembersLength() external view returns (uint) {
+  function getMembersLength() external view returns (uint length) {
     return members.length;
   }
 
   /// @notice Return member details based on its order of enrollment.
   /// @param _index position of member (starting from zero) on list of members
   /// @return address and balance of member
-  function getMemberDetailsByIndex(uint _index) external view returns (address, uint) {
+  function getMemberDetailsByIndex(uint _index) external view returns (address member, uint balance) {
     require(_index < members.length, "invalid member index");
     return (members[_index], balances[members[_index]]);
   }
@@ -89,7 +89,7 @@ contract Splitter {
   /// @notice Return member balance according to its address.
   /// @param _member address of member
   /// @return balance of member
-  function getMemberBalance(address _member) external view returns (uint) {
+  function getMemberBalance(address _member) external view returns (uint balance) {
     require(enrolled[_member] == true, "member not found");
     return balances[_member];
   }
