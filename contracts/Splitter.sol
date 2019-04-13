@@ -41,13 +41,19 @@ contract Splitter {
   function deposit() external payable {
     require(enrolled[msg.sender] == true, "member not enrolled");
     require(msg.value != uint(0), "no funds provided");
-    require(msg.value > members.length - 1, "deposit amount too small");
-    uint _amount = msg.value / (members.length - 1);
-    uint _leftover = msg.value % (members.length - 1); 
+    require(msg.value >= members.length - 1, "deposit amount too small");
     emit FundsDeposited(msg.sender, msg.value);
-    balances[msg.sender] += _leftover;
-    emit FundsSplitted(msg.sender, _leftover);
-    for(uint8 i = uint8(0); i < members.length; i++) {
+    uint _amount = uint(0);
+    uint _leftover = msg.value;
+    if(members.length > 1) {
+      _amount = msg.value / (members.length - 1);
+      _leftover = msg.value % (members.length - 1); 
+    }
+    if(_leftover > 0) {
+      balances[msg.sender] += _leftover;
+      emit FundsSplitted(msg.sender, _leftover);
+    }
+    for(uint i = uint(0); i < members.length; i++) {
       if(members[i] != msg.sender) {
         balances[members[i]] += _amount;
         emit FundsSplitted(members[i], _amount);
