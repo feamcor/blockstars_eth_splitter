@@ -1,0 +1,25 @@
+{
+  "name": "blockstars_eth_splitter",
+  "version": "0.0.1",
+  "description": "Blockstars Ethereum Module 5 Splitter",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/feamcor/blockstars_eth_splitter.git"
+  },
+  "author": "Fábio Corrêa <feamcor@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/feamcor/blockstars_eth_splitter/issues"
+  },
+  "homepage": "https://github.com/feamcor/blockstars_eth_splitter#readme",
+  "dependencies": {
+    "truffle-assertions": "^0.8.2"
+  }
+}
