@@ -11,10 +11,7 @@ contract("Splitter", async accounts => {
   const BN_3 = toBN("3");
   const BN_1GW = toBN(toWei("1", "gwei"));
 
-  const ALICE = accounts[0];
-  const BOB = accounts[1];
-  const CAROL = accounts[2];
-  const SOMEONE = accounts[3];
+  const [ALICE, BOB, CAROL, SOMEONE] = accounts;
 
   let splitter = null;
 
@@ -173,5 +170,35 @@ contract("Splitter", async accounts => {
       splitter.deposit({ from: ALICE, value: BN_1 }),
       "deposit amount too smal"
     );
+  });
+
+  it("deposits should increase contract balance", async () => {
+    await splitter.enroll(BOB, { from: ALICE });
+    const before = await getBalance(splitter.address);
+    await splitter.deposit({ from: ALICE, value: BN_1GW });
+    const after = await getBalance(splitter.address);
+    assert(
+      toBN(after)
+        .sub(toBN(before))
+        .eq(BN_1GW),
+      "contract balance mismatch 1"
+    );
+    const amount = toBN("123456789");
+    await splitter.deposit({ from: ALICE, value: amount });
+    const after2 = await getBalance(splitter.address);
+    assert(
+      toBN(after2)
+        .sub(toBN(after))
+        .eq(amount),
+      "contract balance mismatch 2"
+    );
+  });
+
+  it("group of 1 should withdraw all funds", async () => {
+    await splitter.deposit({ from: ALICE, value: BN_1GW });
+    const result = await splitter.withdraw({ from: ALICE });
+    await eventEmitted(result, "FundsWithdrew", log => {
+      return log.by === ALICE && log.amount.eq(BN_1GW);
+    });
   });
 });
