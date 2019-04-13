@@ -1,6 +1,7 @@
 const truffleAssert = require("truffle-assertions");
 const { createTransactionResult, eventEmitted, reverts } = truffleAssert;
 const { toBN, toWei } = web3.utils;
+const { getBalance } = web3.eth;
 const Splitter = artifacts.require("Splitter");
 
 contract("Splitter", async accounts => {
@@ -8,7 +9,7 @@ contract("Splitter", async accounts => {
   const BN_1 = toBN("1");
   const BN_2 = toBN("2");
   const BN_3 = toBN("3");
-  const BN_1ETH = toBN(toWei("1", "ether"));
+  const BN_1GW = toBN(toWei("1", "gwei"));
 
   const ALICE = accounts[0];
   const BOB = accounts[1];
@@ -94,33 +95,33 @@ contract("Splitter", async accounts => {
   });
 
   it("group of 1 should deposit and add leftover", async () => {
-    const result = await splitter.deposit({ from: ALICE, value: BN_1ETH });
+    const result = await splitter.deposit({ from: ALICE, value: BN_1GW });
     await eventEmitted(result, "FundsDeposited", log => {
-      return log.by === ALICE && log.amount.eq(BN_1ETH);
+      return log.by === ALICE && log.amount.eq(BN_1GW);
     });
     await eventEmitted(result, "FundsSplitted", log => {
-      return log.to === ALICE && log.amount.eq(BN_1ETH);
+      return log.to === ALICE && log.amount.eq(BN_1GW);
     });
   });
 
   it("group of 2 should deposit and add amount", async () => {
     await splitter.enroll(BOB, { from: ALICE });
-    const result = await splitter.deposit({ from: ALICE, value: BN_1ETH });
+    const result = await splitter.deposit({ from: ALICE, value: BN_1GW });
     await eventEmitted(result, "FundsDeposited", log => {
-      return log.by === ALICE && log.amount.eq(BN_1ETH);
+      return log.by === ALICE && log.amount.eq(BN_1GW);
     });
     await eventEmitted(result, "FundsSplitted", log => {
-      return log.to === BOB && log.amount.eq(BN_1ETH);
+      return log.to === BOB && log.amount.eq(BN_1GW);
     });
   });
 
   it("group of 3 should deposit and split amount", async () => {
     await splitter.enroll(BOB, { from: ALICE });
     await splitter.enroll(CAROL, { from: BOB });
-    const amount = toBN(toWei("0.5", "ether"));
-    const result = await splitter.deposit({ from: ALICE, value: BN_1ETH });
+    const amount = toBN(toWei("0.5", "gwei"));
+    const result = await splitter.deposit({ from: ALICE, value: BN_1GW });
     await eventEmitted(result, "FundsDeposited", log => {
-      return log.by === ALICE && log.amount.eq(BN_1ETH);
+      return log.by === ALICE && log.amount.eq(BN_1GW);
     });
     await eventEmitted(result, "FundsSplitted", log => {
       return log.to === BOB && log.amount.eq(amount);
@@ -153,7 +154,7 @@ contract("Splitter", async accounts => {
 
   it("should not allow non-member to deposit", async () => {
     await reverts(
-      splitter.deposit({ from: SOMEONE, value: BN_1ETH }),
+      splitter.deposit({ from: SOMEONE, value: BN_1GW }),
       "member not enrolled"
     );
   });
