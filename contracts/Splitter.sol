@@ -27,10 +27,10 @@ contract Splitter {
   /// @param _member address of the new member.
   /// @dev Emits `MemberEnrolled` event.
   function enroll(address _member) external {
-    require(enrolled[msg.sender] == true, "not allowed to enroll members");
+    require(enrolled[msg.sender], "not allowed to enroll members");
     require(_member != address(0x0), "member not valid");
     require(members.length < MAX_MEMBERS, "no more members accepted");
-    require(enrolled[_member] == false, "member already enrolled");
+    require(!enrolled[_member], "member already enrolled");
     members.push(_member);
     enrolled[_member] = true;
     emit MemberEnrolled(msg.sender, _member);
@@ -39,7 +39,7 @@ contract Splitter {
   /// @notice Deposit and split funds to members of the group, but the depositer.
   /// @dev Emits `FundsDeposited` (once) and `FundsSplitted` (per member) events.
   function deposit() external payable {
-    require(enrolled[msg.sender] == true, "member not enrolled");
+    require(enrolled[msg.sender], "member not enrolled");
     require(msg.value != uint(0), "no funds provided");
     require(msg.value >= members.length - 1, "deposit amount too small");
     emit FundsDeposited(msg.sender, msg.value);
@@ -64,7 +64,7 @@ contract Splitter {
   /// @notice Withdraw splitted funds from previous deposits.
   /// @dev Emits `FundsWithdrew` event.
   function withdraw() external payable {
-    require(enrolled[msg.sender] == true, "member not enrolled");
+    require(enrolled[msg.sender], "member not enrolled");
     require(balances[msg.sender] != uint(0), "no balance left");
     uint _amount = balances[msg.sender];
     balances[msg.sender] = 0;
@@ -90,7 +90,7 @@ contract Splitter {
   /// @param _member address of member
   /// @return balance of member
   function getMemberBalance(address _member) external view returns (uint balance) {
-    require(enrolled[_member] == true, "member not found");
+    require(enrolled[_member], "member not found");
     return balances[_member];
   }
 }
