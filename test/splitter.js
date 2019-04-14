@@ -15,190 +15,184 @@ contract("Splitter", async accounts => {
 
   let splitter = null;
 
-  beforeEach("spawn new instance of contract", async () => {
-    splitter = await Splitter.new({ from: ALICE });
-  });
-
-  it("constructor should enroll 1st member", async () => {
-    const result = await createTransactionResult(
-      splitter,
-      splitter.transactionHash
-    );
-    await eventEmitted(result, "MemberEnrolled", log => {
-      return log.by === ALICE && log.member === ALICE;
+  describe("check revert on constructor", async () => {
+    it("should not allow quantity zero", async () => {
+      await reverts(
+        Splitter.new(BN_0, { from: ALICE }),
+        "quantity cannot be zero"
+      );
     });
-    const length = await splitter.getMembersLength();
-    const details = await splitter.getMemberDetailsByIndex(0);
-    assert(length.eq(BN_1), "members array length not 1");
-    assert.strictEqual(details.member, ALICE, "1st member mismatch");
-    assert(details.balance.eq(BN_0), "1st member balance not zero");
-  });
 
-  it("should enroll 2nd member", async () => {
-    const result = await splitter.enroll(BOB, { from: ALICE });
-    await eventEmitted(result, "MemberEnrolled", log => {
-      return log.by === ALICE && log.member === BOB;
-    });
-    const length = await splitter.getMembersLength();
-    const details = await splitter.getMemberDetailsByIndex(1);
-    assert(length.eq(BN_2), "members array length not 2");
-    assert.strictEqual(details.member, BOB, "2nd member mismatch");
-    assert(details.balance.eq(BN_0), "2nd member balance not zero");
-  });
-
-  it("should enroll 3rd member", async () => {
-    await splitter.enroll(BOB, { from: ALICE });
-    const result = await splitter.enroll(CAROL, { from: BOB });
-    await eventEmitted(result, "MemberEnrolled", log => {
-      return log.by === BOB && log.member === CAROL;
-    });
-    const length = await splitter.getMembersLength();
-    const details = await splitter.getMemberDetailsByIndex(2);
-    assert(length.eq(BN_3), "members array length not 3");
-    assert.strictEqual(details.member, CAROL, "3rd member mismatch");
-    assert(details.balance.eq(BN_0), "3rd member balance not zero");
-  });
-
-  it("should not allow to enroll 4th member", async () => {
-    await splitter.enroll(BOB, { from: ALICE });
-    await splitter.enroll(CAROL, { from: BOB });
-    await reverts(
-      splitter.enroll(SOMEONE, { from: CAROL }),
-      "no more members accepted"
-    );
-  });
-
-  it("should not allow to enroll existing member", async () => {
-    await reverts(
-      splitter.enroll(ALICE, { from: ALICE }),
-      "member already enrolled"
-    );
-  });
-
-  it("should not allow non-member to enroll someone else", async () => {
-    await reverts(
-      splitter.enroll(SOMEONE, { from: CAROL }),
-      "not allowed to enroll"
-    );
-  });
-
-  it("should not allow to enroll member with invalid address", async () => {
-    await reverts(
-      splitter.enroll("0x0000000000000000000000000000000000000000", {
-        from: ALICE
-      }),
-      "member not valid"
-    );
-  });
-
-  it("group of 1 should deposit and add leftover", async () => {
-    const result = await splitter.deposit({ from: ALICE, value: BN_1GW });
-    await eventEmitted(result, "FundsDeposited", log => {
-      return log.by === ALICE && log.amount.eq(BN_1GW);
-    });
-    await eventEmitted(result, "FundsSplitted", log => {
-      return log.to === ALICE && log.amount.eq(BN_1GW);
+    it("should not allow quantity too large", async () => {
+      await reverts(
+        Splitter.new(toBN("11"), { from: ALICE }),
+        "quantity too large"
+      );
     });
   });
 
-  it("group of 2 should deposit and add amount", async () => {
-    await splitter.enroll(BOB, { from: ALICE });
-    const result = await splitter.deposit({ from: ALICE, value: BN_1GW });
-    await eventEmitted(result, "FundsDeposited", log => {
-      return log.by === ALICE && log.amount.eq(BN_1GW);
+  describe("check general test cases", async () => {
+    beforeEach("deploy new instance of contract", async () => {
+      splitter = await Splitter.new(BN_2, { from: ALICE });
     });
-    await eventEmitted(result, "FundsSplitted", log => {
-      return log.to === BOB && log.amount.eq(BN_1GW);
-    });
-  });
 
-  it("group of 3 should deposit and split amount", async () => {
-    await splitter.enroll(BOB, { from: ALICE });
-    await splitter.enroll(CAROL, { from: BOB });
-    const amount = toBN(toWei("0.5", "gwei"));
-    const result = await splitter.deposit({ from: ALICE, value: BN_1GW });
-    await eventEmitted(result, "FundsDeposited", log => {
-      return log.by === ALICE && log.amount.eq(BN_1GW);
+    it("should initialize contract", async () => {
+      const result = await createTransactionResult(
+        splitter,
+        splitter.transactionHash
+      );
+      await eventEmitted(result, "Initialized", log => {
+        return log.by === ALICE && log.quantity.eq(BN_2);
+      });
+      let balance = await getBalance(splitter.address);
+      balance = toBN(balance);
+      assert(balance.eq(BN_0), "contract balance is not zero");
     });
-    await eventEmitted(result, "FundsSplitted", log => {
-      return log.to === BOB && log.amount.eq(amount);
-    });
-    await eventEmitted(result, "FundsSplitted", log => {
-      return log.to === CAROL && log.amount.eq(amount);
-    });
-  });
 
-  it("group of 3 should deposit and split amount and leftover", async () => {
-    await splitter.enroll(BOB, { from: ALICE });
-    await splitter.enroll(CAROL, { from: BOB });
-    const value = toBN("333");
-    const amount = toBN("166");
-    const leftover = toBN("1");
-    const result = await splitter.deposit({ from: ALICE, value: value });
-    await eventEmitted(result, "FundsDeposited", log => {
-      return log.by === ALICE && log.amount.eq(value);
+    it("owner should enroll 1st member", async () => {
+      const result = await splitter.enroll(BOB, { from: ALICE });
+      await eventEmitted(result, "MemberEnrolled", log => {
+        return log.by === ALICE && log.member === BOB;
+      });
+      const length = await splitter.getMembersLength();
+      const details = await splitter.getMemberDetailsByIndex(BN_0);
+      assert(length.eq(BN_1), "members length not 1");
+      assert.strictEqual(details.member, BOB, "1st member mismatch");
+      assert(details.balance.eq(BN_0), "1st member balance not zero");
     });
-    await eventEmitted(result, "FundsSplitted", log => {
-      return log.to === ALICE && log.amount.eq(leftover);
+
+    it("owner should enroll 2nd member", async () => {
+      await splitter.enroll(BOB, { from: ALICE });
+      const result = await splitter.enroll(CAROL, { from: ALICE });
+      await eventEmitted(result, "MemberEnrolled", log => {
+        return log.by === ALICE && log.member === CAROL;
+      });
+      const length = await splitter.getMembersLength();
+      const details = await splitter.getMemberDetailsByIndex(BN_1);
+      assert(length.eq(BN_2), "members length not 2");
+      assert.strictEqual(details.member, CAROL, "2nd member mismatch");
+      assert(details.balance.eq(BN_0), "2nd member balance not zero");
     });
-    await eventEmitted(result, "FundsSplitted", log => {
-      return log.to === BOB && log.amount.eq(amount);
+
+    it("owner should not be allowed to enroll 3rd member", async () => {
+      await splitter.enroll(BOB, { from: ALICE });
+      await splitter.enroll(CAROL, { from: ALICE });
+      await reverts(
+        splitter.enroll(SOMEONE, { from: ALICE }),
+        "all members enrolled"
+      );
     });
-    await eventEmitted(result, "FundsSplitted", log => {
-      return log.to === CAROL && log.amount.eq(amount);
+
+    it("owner should not be allowed to enroll existing member", async () => {
+      await splitter.enroll(BOB, { from: ALICE });
+      await reverts(
+        splitter.enroll(BOB, { from: ALICE }),
+        "member already enrolled"
+      );
     });
-  });
 
-  it("should not allow non-member to deposit", async () => {
-    await reverts(
-      splitter.deposit({ from: SOMEONE, value: BN_1GW }),
-      "member not enrolled"
-    );
-  });
+    it("non-owner should not be allowed to enroll member", async () => {
+      await reverts(splitter.enroll(BOB, { from: SOMEONE }), "not owner");
+    });
 
-  it("should not allow deposit of no funds", async () => {
-    await reverts(
-      splitter.deposit({ from: ALICE, value: BN_0 }),
-      "no funds provided"
-    );
-  });
+    it("non-owner should not be allowed to deposit", async () => {
+      await reverts(
+        splitter.deposit({ from: SOMEONE, value: BN_1GW }),
+        "not owner"
+      );
+    });
 
-  it("should not allow deposit of small funds", async () => {
-    await splitter.enroll(BOB, { from: ALICE });
-    await splitter.enroll(CAROL, { from: BOB });
-    await reverts(
-      splitter.deposit({ from: ALICE, value: BN_1 }),
-      "deposit amount too smal"
-    );
-  });
+    it("owner should not be allowed to deposit while enrollment is not completed", async () => {
+      await splitter.enroll(BOB, { from: ALICE });
+      await reverts(
+        splitter.deposit({ from: ALICE, value: BN_1GW }),
+        "not all members enrolled"
+      );
+    });
 
-  it("deposits should increase contract balance", async () => {
-    await splitter.enroll(BOB, { from: ALICE });
-    const before = await getBalance(splitter.address);
-    await splitter.deposit({ from: ALICE, value: BN_1GW });
-    const after = await getBalance(splitter.address);
-    assert(
-      toBN(after)
-        .sub(toBN(before))
-        .eq(BN_1GW),
-      "contract balance mismatch 1"
-    );
-    const amount = toBN("123456789");
-    await splitter.deposit({ from: ALICE, value: amount });
-    const after2 = await getBalance(splitter.address);
-    assert(
-      toBN(after2)
-        .sub(toBN(after))
-        .eq(amount),
-      "contract balance mismatch 2"
-    );
-  });
+    it("owner should deposit and split funds", async () => {
+      await splitter.enroll(BOB, { from: ALICE });
+      await splitter.enroll(CAROL, { from: ALICE });
+      const amount = toBN(toWei("0.5", "gwei"));
+      const result = await splitter.deposit({ from: ALICE, value: BN_1GW });
+      await eventEmitted(result, "FundsDeposited", log => {
+        return log.by === ALICE && log.amount.eq(BN_1GW);
+      });
+      await eventEmitted(result, "FundsSplitted", log => {
+        return log.by === ALICE && log.to === BOB && log.amount.eq(amount);
+      });
+      await eventEmitted(result, "FundsSplitted", log => {
+        return log.by === ALICE && log.to === CAROL && log.amount.eq(amount);
+      });
+      let balance = await getBalance(splitter.address);
+      balance = toBN(balance);
+      assert(balance.eq(BN_1GW), "contract balance mismatch");
+      balance = await splitter.getMemberBalance(BOB);
+      assert(balance.eq(amount), "member 0 balance mismatch");
+      balance = await splitter.getMemberBalance(CAROL);
+      assert(balance.eq(amount), "member 1 balance mismatch");
+    });
 
-  it("group of 1 should withdraw all funds", async () => {
-    await splitter.deposit({ from: ALICE, value: BN_1GW });
-    const result = await splitter.withdraw({ from: ALICE });
-    await eventEmitted(result, "FundsWithdrew", log => {
-      return log.by === ALICE && log.amount.eq(BN_1GW);
+    it("owner should deposit and contract keeps remainder", async () => {
+      await splitter.enroll(BOB, { from: ALICE });
+      await splitter.enroll(CAROL, { from: ALICE });
+      const value = toBN("333");
+      const amount = toBN("166");
+      const result = await splitter.deposit({ from: ALICE, value: value });
+      await eventEmitted(result, "FundsDeposited", log => {
+        return log.by === ALICE && log.amount.eq(value);
+      });
+      await eventEmitted(result, "FundsSplitted", log => {
+        return log.by === ALICE && log.to === BOB && log.amount.eq(amount);
+      });
+      await eventEmitted(result, "FundsSplitted", log => {
+        return log.by === ALICE && log.to === CAROL && log.amount.eq(amount);
+      });
+      let balance = await getBalance(splitter.address);
+      balance = toBN(balance);
+      assert(balance.eq(value), "contract balance mismatch");
+      balance = await splitter.getMemberBalance(BOB);
+      assert(balance.eq(amount), "member 0 balance mismatch");
+      balance = await splitter.getMemberBalance(CAROL);
+      assert(balance.eq(amount), "member 1 balance mismatch");
+    });
+
+    it("should not allow deposit of no funds", async () => {
+      await reverts(
+        splitter.deposit({ from: ALICE, value: BN_0 }),
+        "no funds provided"
+      );
+    });
+
+    it("deposits should increase contract balance", async () => {
+      await splitter.enroll(BOB, { from: ALICE });
+      await splitter.enroll(CAROL, { from: ALICE });
+      let bal0 = await getBalance(splitter.address);
+      bal0 = toBN(bal0);
+      await splitter.deposit({ from: ALICE, value: BN_1GW });
+      let bal1 = await getBalance(splitter.address);
+      bal1 = toBN(bal1);
+      assert(bal1.sub(bal0).eq(BN_1GW), "contract balance mismatch 1");
+      const amount = toBN("123456789");
+      await splitter.deposit({ from: ALICE, value: amount });
+      let bal2 = await getBalance(splitter.address);
+      bal2 = toBN(bal2);
+      assert(bal2.sub(bal1).eq(amount), "contract balance mismatch 2");
+    });
+
+    it("members should withdraw funds", async () => {
+      await splitter.enroll(BOB, { from: ALICE });
+      await splitter.enroll(CAROL, { from: ALICE });
+      await splitter.deposit({ from: ALICE, value: BN_1GW });
+      const amount = toBN(toWei("0.5", "gwei"));
+      const res0 = await splitter.withdraw({ from: BOB });
+      await eventEmitted(res0, "FundsWithdrew", log => {
+        return log.by === BOB && log.amount.eq(amount);
+      });
+      const res1 = await splitter.withdraw({ from: CAROL });
+      await eventEmitted(res1, "FundsWithdrew", log => {
+        return log.by === CAROL && log.amount.eq(amount);
+      });
     });
   });
 });

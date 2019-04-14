@@ -5,73 +5,69 @@ pragma solidity 0.5.2;
 /// @notice B9lab Blockstars Certified Ethereum Developer Course
 /// @notice Module 5 project: Splitter
 contract Splitter {
-  uint constant private MAX_MEMBERS = uint(3);
+  address private owner;
+  uint public quantity;
   address[] private members;
   mapping(address => bool) private enrolled;
   mapping(address => uint) private balances;
 
+  event Initialized(address indexed by, uint quantity);
   event MemberEnrolled(address indexed by, address indexed member);
   event FundsDeposited(address indexed by, uint amount);
-  event FundsSplitted(address indexed to, uint amount);
+  event FundsSplitted(address indexed by, address indexed to, uint amount);
   event FundsWithdrew(address indexed by, uint amount);
 
-  /// @notice Initialize contract by adding deployer as first member of the group.
-  /// @dev Emits `MemberEnrolled` event.
-  constructor() public {
-    members.push(msg.sender);
-    enrolled[msg.sender] = true;
-    emit MemberEnrolled(msg.sender, msg.sender);
+  modifier isOwner() {
+    require(msg.sender == owner, "not owner");
+    _;
   }
 
-  /// @notice Add new member to group.
-  /// @param _member address of the new member.
+  /// @notice Initialize contract.
+  /// @param _quantity number of members to be enrolled in the group
+  /// @dev Emits `Initialized` event.
+  constructor(uint _quantity) public {
+    require(_quantity != uint(0), "quantity cannot be zero");
+    require(_quantity <= uint(10), "quantity too large");
+    owner = msg.sender;
+    quantity = _quantity;
+    emit Initialized(owner, quantity);
+  }
+
+  /// @notice Add member to group.
+  /// @param _member address of the new member
   /// @dev Emits `MemberEnrolled` event.
-  function enroll(address _member) external {
-    require(enrolled[msg.sender], "not allowed to enroll members");
-    require(_member != address(0x0), "member not valid");
-    require(members.length < MAX_MEMBERS, "no more members accepted");
+  function enroll(address _member) external isOwner {
+    require(members.length < quantity, "all members enrolled");
     require(!enrolled[_member], "member already enrolled");
     members.push(_member);
     enrolled[_member] = true;
     emit MemberEnrolled(msg.sender, _member);
   }
 
-  /// @notice Deposit and split funds to members of the group, but the depositer.
+  /// @notice Deposit and split funds among the members of the group.
   /// @dev Emits `FundsDeposited` (once) and `FundsSplitted` (per member) events.
-  function deposit() external payable {
-    require(enrolled[msg.sender], "member not enrolled");
+  function deposit() external payable isOwner {
     require(msg.value != uint(0), "no funds provided");
-    require(msg.value >= members.length - 1, "deposit amount too small");
+    require(members.length == quantity, "not all members enrolled");
     emit FundsDeposited(msg.sender, msg.value);
-    uint _amount = uint(0);
-    uint _leftover = msg.value;
-    if(members.length > 1) {
-      _amount = msg.value / (members.length - 1);
-      _leftover = msg.value % (members.length - 1); 
-    }
-    if(_leftover > 0) {
-      balances[msg.sender] += _leftover;
-      emit FundsSplitted(msg.sender, _leftover);
-    }
-    for(uint i = uint(0); i < members.length; i++) {
-      if(members[i] != msg.sender) {
-        balances[members[i]] += _amount;
-        emit FundsSplitted(members[i], _amount);
-      }
+    uint _amount = msg.value / quantity;
+    for(uint i = 0; i < quantity; i++) {
+      balances[members[i]] += _amount;
+      emit FundsSplitted(msg.sender, members[i], _amount);
     }
   }
 
   /// @notice Withdraw splitted funds from previous deposits.
   /// @dev Emits `FundsWithdrew` event.
   function withdraw() external payable {
-    require(balances[msg.sender] != uint(0), "not enrolled or no balance");
+    require(balances[msg.sender] != uint(0), "no balance or not enrolled");
     uint _amount = balances[msg.sender];
-    balances[msg.sender] = 0;
+    balances[msg.sender] = uint(0);
     msg.sender.transfer(_amount);
     emit FundsWithdrew(msg.sender, _amount);
   }
 
-  /// @notice Return number of members enrolled in the group.
+  /// @notice Return number of members enrolled, so far, in the group.
   /// @return number of members enrolled.
   function getMembersLength() public view returns (uint length) {
     return members.length;
