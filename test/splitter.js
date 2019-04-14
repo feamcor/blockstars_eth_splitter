@@ -133,7 +133,7 @@ contract("Splitter", async accounts => {
       assert(balance.eq(amount), "member 1 balance mismatch");
     });
 
-    it("owner should deposit and contract keeps remainder", async () => {
+    it("should keep split remainder", async () => {
       await splitter.enroll(BOB, { from: ALICE });
       await splitter.enroll(CAROL, { from: ALICE });
       const value = toBN("333");
@@ -164,7 +164,7 @@ contract("Splitter", async accounts => {
       );
     });
 
-    it("deposits should increase contract balance", async () => {
+    it("should increase contract balance", async () => {
       await splitter.enroll(BOB, { from: ALICE });
       await splitter.enroll(CAROL, { from: ALICE });
       let bal0 = await getBalance(splitter.address);
@@ -180,7 +180,7 @@ contract("Splitter", async accounts => {
       assert(bal2.sub(bal1).eq(amount), "contract balance mismatch 2");
     });
 
-    it("members should withdraw funds", async () => {
+    it("should allow members to withdraw", async () => {
       await splitter.enroll(BOB, { from: ALICE });
       await splitter.enroll(CAROL, { from: ALICE });
       await splitter.deposit({ from: ALICE, value: BN_1GW });
@@ -193,6 +193,21 @@ contract("Splitter", async accounts => {
       await eventEmitted(res1, "FundsWithdrew", log => {
         return log.by === CAROL && log.amount.eq(amount);
       });
+    });
+
+    it("should not allow member to withdraw when balance is zero", async () => {
+      await splitter.enroll(BOB, { from: ALICE });
+      await reverts(
+        splitter.withdraw({ from: BOB }),
+        "no balance or not enrolled"
+      );
+    });
+
+    it("should not allow non-member to withdraw", async () => {
+      await reverts(
+        splitter.withdraw({ from: BOB }),
+        "no balance or not enrolled"
+      );
     });
   });
 });
