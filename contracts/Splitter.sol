@@ -52,8 +52,9 @@ contract Splitter {
     emit FundsDeposited(msg.sender, msg.value);
     uint _amount = msg.value / quantity;
     for(uint i = 0; i < quantity; i++) {
-      balances[members[i]] += _amount;
-      emit FundsSplitted(msg.sender, members[i], _amount);
+      address _member = members[i];
+      balances[_member] += _amount;
+      emit FundsSplitted(msg.sender, _member, _amount);
     }
   }
 
@@ -78,7 +79,8 @@ contract Splitter {
   /// @return address and balance of member or zeros if out of range
   function getMemberDetailsByIndex(uint _index) public view returns (address member, uint balance) {
     if(_index < members.length) {
-      return (members[_index], balances[members[_index]]);
+      address _member = members[_index];
+      return (_member, balances[_member]);
     } else {
       return (address(0x0), uint(0));
     }
