@@ -2,12 +2,14 @@ pragma solidity 0.5.2;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
+import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 
 /// @title Split deposited funds among recipient accounts.
 /// @author Fábio Corrêa <feamcor@gmail.com>
 /// @notice B9lab Blockstars Certified Ethereum Developer Course
 /// @notice Module 5 project: Splitter
-contract Splitter is Ownable {
+contract Splitter is Ownable, Pausable, ReentrancyGuard {
   using SafeMath for uint;
   address public recipient1;
   address public recipient2;
@@ -35,7 +37,7 @@ contract Splitter is Ownable {
   /// @notice Deposit and split funds among the recipient accounts.
   /// @notice Any remainder resulting from split will be added to 1st recipient. 
   /// @dev Emits `FundsDeposited` and `FundsSplitted` events.
-  function deposit() external payable onlyOwner {
+  function deposit() external payable whenNotPaused onlyOwner nonReentrant {
     require(msg.value != uint(0), "no funds provided");
     uint _split2 = msg.value.div(2);
     uint _split1 = _split2.add(msg.value.mod(2));
@@ -48,7 +50,7 @@ contract Splitter is Ownable {
 
   /// @notice Withdraw accumulated balance.
   /// @dev Emits `FundsWithdrew` event.
-  function withdraw() external {
+  function withdraw() external whenNotPaused nonReentrant {
     uint _balance;
     if(msg.sender == recipient1) {
       _balance = balance1;
