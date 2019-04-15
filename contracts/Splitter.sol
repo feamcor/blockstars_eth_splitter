@@ -1,12 +1,14 @@
 pragma solidity 0.5.2;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 /// @title Split deposited funds among members of a group
 /// @author Fábio Corrêa <feamcor@gmail.com>
 /// @notice B9lab Blockstars Certified Ethereum Developer Course
 /// @notice Module 5 project: Splitter
 contract Splitter is Ownable {
+  using SafeMath for uint;
   uint public quantity;
   address[] private members;
   mapping(address => bool) private enrolled;
@@ -45,10 +47,10 @@ contract Splitter is Ownable {
     require(msg.value != uint(0), "no funds provided");
     require(members.length == quantity, "not all members enrolled");
     emit FundsDeposited(msg.sender, msg.value);
-    uint _amount = msg.value / quantity;
+    uint _amount = msg.value.div(quantity);
     for(uint i = 0; i < quantity; i++) {
       address _member = members[i];
-      balances[_member] += _amount;
+      balances[_member] = balances[_member].add(_amount);
       emit FundsSplitted(msg.sender, _member, _amount);
     }
   }
