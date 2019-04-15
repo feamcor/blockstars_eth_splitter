@@ -60,7 +60,7 @@ contract Splitter {
 
   /// @notice Withdraw splitted funds from previous deposits.
   /// @dev Emits `FundsWithdrew` event.
-  function withdraw() external payable {
+  function withdraw() external {
     require(balances[msg.sender] != uint(0), "no balance or not enrolled");
     uint _amount = balances[msg.sender];
     balances[msg.sender] = uint(0);
