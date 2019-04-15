@@ -92,14 +92,11 @@ contract("Splitter", async accounts => {
     });
 
     it("non-owner should not be allowed to enroll member", async () => {
-      await reverts(splitter.enroll(BOB, { from: SOMEONE }), "not owner");
+      await reverts(splitter.enroll(BOB, { from: SOMEONE }));
     });
 
     it("non-owner should not be allowed to deposit", async () => {
-      await reverts(
-        splitter.deposit({ from: SOMEONE, value: BN_1GW }),
-        "not owner"
-      );
+      await reverts(splitter.deposit({ from: SOMEONE, value: BN_1GW }));
     });
 
     it("owner should not be allowed to deposit while enrollment is not completed", async () => {

@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/feamcor/blockstars_eth_splitter#readme",
   "dependencies": {
+    "openzeppelin-solidity": "^2.2.0",
     "truffle-assertions": "^0.8.2"
   }
 }

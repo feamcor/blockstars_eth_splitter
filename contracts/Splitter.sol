@@ -1,11 +1,12 @@
 pragma solidity 0.5.2;
 
+import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+
 /// @title Split deposited funds among members of a group
 /// @author Fábio Corrêa <feamcor@gmail.com>
 /// @notice B9lab Blockstars Certified Ethereum Developer Course
 /// @notice Module 5 project: Splitter
-contract Splitter {
-  address private owner;
+contract Splitter is Ownable {
   uint public quantity;
   address[] private members;
   mapping(address => bool) private enrolled;
@@ -17,26 +18,20 @@ contract Splitter {
   event FundsSplitted(address indexed by, address indexed to, uint amount);
   event FundsWithdrew(address indexed by, uint amount);
 
-  modifier isOwner() {
-    require(msg.sender == owner, "not owner");
-    _;
-  }
-
   /// @notice Initialize contract.
   /// @param _quantity number of members to be enrolled in the group
   /// @dev Emits `Initialized` event.
   constructor(uint _quantity) public {
     require(_quantity != uint(0), "quantity cannot be zero");
     require(_quantity <= uint(10), "quantity too large");
-    owner = msg.sender;
     quantity = _quantity;
-    emit Initialized(owner, quantity);
+    emit Initialized(msg.sender, quantity);
   }
 
   /// @notice Add member to group.
   /// @param _member address of the new member
   /// @dev Emits `MemberEnrolled` event.
-  function enroll(address _member) external isOwner {
+  function enroll(address _member) external onlyOwner {
     require(members.length < quantity, "all members enrolled");
     require(!enrolled[_member], "member already enrolled");
     members.push(_member);
@@ -46,7 +41,7 @@ contract Splitter {
 
   /// @notice Deposit and split funds among the members of the group.
   /// @dev Emits `FundsDeposited` (once) and `FundsSplitted` (per member) events.
-  function deposit() external payable isOwner {
+  function deposit() external payable onlyOwner {
     require(msg.value != uint(0), "no funds provided");
     require(members.length == quantity, "not all members enrolled");
     emit FundsDeposited(msg.sender, msg.value);
