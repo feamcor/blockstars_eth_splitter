@@ -1,5 +1,5 @@
 const Splitter = artifacts.require("Splitter");
 
-module.exports = function(deployer) {
-  deployer.deploy(Splitter, web3.utils.toBN("2"));
+module.exports = function(deployer, network, accounts) {
+    deployer.deploy(Splitter, accounts[1], accounts[2]);
 };

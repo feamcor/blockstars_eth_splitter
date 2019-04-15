@@ -3,90 +3,64 @@ pragma solidity 0.5.2;
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
-/// @title Split deposited funds among members of a group
+/// @title Split deposited funds among recipient accounts.
 /// @author Fábio Corrêa <feamcor@gmail.com>
 /// @notice B9lab Blockstars Certified Ethereum Developer Course
 /// @notice Module 5 project: Splitter
 contract Splitter is Ownable {
   using SafeMath for uint;
-  uint public quantity;
-  address[] private members;
-  mapping(address => bool) private enrolled;
-  mapping(address => uint) private balances;
+  address public recipient1;
+  address public recipient2;
+  uint public balance1;
+  uint public balance2;
 
-  event Initialized(address indexed by, uint quantity);
-  event MemberEnrolled(address indexed by, address indexed member);
+  event RecipientSet(address indexed by, address indexed recipient);
   event FundsDeposited(address indexed by, uint amount);
   event FundsSplitted(address indexed by, address indexed to, uint amount);
   event FundsWithdrew(address indexed by, uint amount);
 
-  /// @notice Initialize contract.
-  /// @param _quantity number of members to be enrolled in the group
-  /// @dev Emits `Initialized` event.
-  constructor(uint _quantity) public {
-    require(_quantity != uint(0), "quantity cannot be zero");
-    require(_quantity <= uint(10), "quantity too large");
-    quantity = _quantity;
-    emit Initialized(msg.sender, quantity);
+  /// @notice Initialize contract and members that will receive the splitted funds.
+  /// @param _recipient1 address of first recipient account
+  /// @param _recipient2 address of second recipient account
+  /// @dev Emits `OwnershipTransferred` and `RecipientSet` events.
+  constructor(address _recipient1, address _recipient2) public {
+    require(_recipient1 != _recipient2, "recipients must be different");
+    require(_recipient1 != msg.sender && _recipient2 != msg.sender, "owner cannot be recipient");
+    recipient1 = _recipient1;
+    recipient2 = _recipient2;
+    emit RecipientSet(msg.sender, _recipient1);
+    emit RecipientSet(msg.sender, _recipient2);
   }
 
-  /// @notice Add member to group.
-  /// @param _member address of the new member
-  /// @dev Emits `MemberEnrolled` event.
-  function enroll(address _member) external onlyOwner {
-    require(members.length < quantity, "all members enrolled");
-    require(!enrolled[_member], "member already enrolled");
-    members.push(_member);
-    enrolled[_member] = true;
-    emit MemberEnrolled(msg.sender, _member);
-  }
-
-  /// @notice Deposit and split funds among the members of the group.
-  /// @dev Emits `FundsDeposited` (once) and `FundsSplitted` (per member) events.
+  /// @notice Deposit and split funds among the recipient accounts.
+  /// @notice Any remainder resulting from split will be added to 1st recipient. 
+  /// @dev Emits `FundsDeposited` and `FundsSplitted` events.
   function deposit() external payable onlyOwner {
     require(msg.value != uint(0), "no funds provided");
-    require(members.length == quantity, "not all members enrolled");
+    uint _split2 = msg.value.div(2);
+    uint _split1 = _split2.add(msg.value.mod(2));
+    balance2 = balance2.add(_split2);
+    balance1 = balance1.add(_split1);
     emit FundsDeposited(msg.sender, msg.value);
-    uint _amount = msg.value.div(quantity);
-    for(uint i = 0; i < quantity; i++) {
-      address _member = members[i];
-      balances[_member] = balances[_member].add(_amount);
-      emit FundsSplitted(msg.sender, _member, _amount);
-    }
+    emit FundsSplitted(msg.sender, recipient2, _split2);
+    emit FundsSplitted(msg.sender, recipient1, _split1);
   }
 
-  /// @notice Withdraw splitted funds from previous deposits.
+  /// @notice Withdraw accumulated balance.
   /// @dev Emits `FundsWithdrew` event.
   function withdraw() external {
-    require(balances[msg.sender] != uint(0), "no balance or not enrolled");
-    uint _amount = balances[msg.sender];
-    balances[msg.sender] = uint(0);
-    msg.sender.transfer(_amount);
-    emit FundsWithdrew(msg.sender, _amount);
-  }
-
-  /// @notice Return number of members enrolled, so far, in the group.
-  /// @return number of members enrolled.
-  function getMembersLength() public view returns (uint length) {
-    return members.length;
-  }
-
-  /// @notice Return member details based on its order of enrollment.
-  /// @param _index position of member (starting from zero) on list of members
-  /// @return address and balance of member or zeros if out of range
-  function getMemberDetailsByIndex(uint _index) public view returns (address member, uint balance) {
-    if(_index < members.length) {
-      address _member = members[_index];
-      return (_member, balances[_member]);
+    uint _balance;
+    if(msg.sender == recipient1) {
+      _balance = balance1;
+      balance1 = uint(0);
+    } else if(msg.sender == recipient2) {
+      _balance = balance2;
+      balance2 = uint(0);
     } else {
-      return (address(0x0), uint(0));
-    }
-  }
-
-  /// @notice Return member balance according to its address.
-  /// @param _member address of member
-  /// @return balance of member or zero if non-member
-  function getMemberBalance(address _member) public view returns (uint balance) {
-    return balances[_member];
+      revert("not a recipient");
+    } 
+    require(_balance != uint(0), "balance is zero");
+    msg.sender.transfer(_balance);
+    emit FundsWithdrew(msg.sender, _balance);
   }
 }
