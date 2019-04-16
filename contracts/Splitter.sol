@@ -4,7 +4,6 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
 import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
-import "openzeppelin-solidity/contracts/utils/Address.sol";
 
 /// @title Split deposited funds among recipient accounts.
 /// @author Fábio Corrêa <feamcor@gmail.com>
@@ -12,7 +11,6 @@ import "openzeppelin-solidity/contracts/utils/Address.sol";
 /// @notice Module 5 project: Splitter
 contract Splitter is Ownable, Pausable, ReentrancyGuard {
   using SafeMath for uint;
-  using Address for address;
   address public recipient1;
   address public recipient2;
   uint public balance1;
@@ -31,7 +29,6 @@ contract Splitter is Ownable, Pausable, ReentrancyGuard {
     require(_recipient1 != address(0x0) && _recipient2 != address(0x0), "recipients cannot be empty");
     require(_recipient1 != _recipient2, "recipients must be different");
     require(_recipient1 != msg.sender && _recipient2 != msg.sender, "owner cannot be recipient");
-    require(!_recipient1.isContract() && !_recipient2.isContract(), "recipient cannot be a contract");
     recipient1 = _recipient1;
     recipient2 = _recipient2;
     emit RecipientSet(msg.sender, _recipient1);

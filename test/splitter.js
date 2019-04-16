@@ -52,14 +52,6 @@ contract("Splitter", async accounts => {
       );
     });
 
-    it("should revert when recipient is a contract", async () => {
-      const address = (await Splitter.deployed()).address;
-      await reverts(
-        Splitter.new(address, CAROL, { from: ALICE }),
-        "recipient cannot be a contract"
-      );
-    });
-
     it("should revert when non-owner perform a deposit", async () => {
       const splitter = await Splitter.new(BOB, CAROL, { from: ALICE });
       await reverts(splitter.deposit({ from: SOMEONE, value: BN_1GW }));
