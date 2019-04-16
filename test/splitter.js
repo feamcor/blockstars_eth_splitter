@@ -6,8 +6,6 @@ const Splitter = artifacts.require("Splitter");
 
 contract("Splitter", async accounts => {
   const BN_0 = toBN("0");
-  const BN_1 = toBN("1");
-  const BN_2 = toBN("2");
   const BN_1GW = toBN(toWei("1", "gwei"));
   const BN_HGW = toBN(toWei("0.5", "gwei"));
 
@@ -33,6 +31,15 @@ contract("Splitter", async accounts => {
       assert(balance.eq(BN_0), "contract balance is not zero");
     });
 
+    it("should revert when recipient is empty", async () => {
+      await reverts(
+        Splitter.new(BOB, "0x0000000000000000000000000000000000000000", {
+          from: ALICE
+        }),
+        "recipients cannot be empty"
+      );
+    });
+
     it("should revert when recipient is duplicated", async () => {
       await reverts(
         Splitter.new(BOB, BOB, { from: ALICE }),
@@ -44,6 +51,14 @@ contract("Splitter", async accounts => {
       await reverts(
         Splitter.new(BOB, ALICE, { from: ALICE }),
         "owner cannot be recipient"
+      );
+    });
+
+    it("should revert when recipient is a contract", async () => {
+      const address = (await Splitter.deployed()).address;
+      await reverts(
+        Splitter.new(address, CAROL, { from: ALICE }),
+        "recipient cannot be a contract"
       );
     });
 
@@ -107,16 +122,13 @@ contract("Splitter", async accounts => {
 
     it("should increase contract balance upon deposit", async () => {
       const splitter = await Splitter.new(BOB, CAROL, { from: ALICE });
-      let bal0 = await getBalance(splitter.address);
-      bal0 = toBN(bal0);
+      let bal0 = toBN(await getBalance(splitter.address));
       await splitter.deposit({ from: ALICE, value: BN_1GW });
-      let bal1 = await getBalance(splitter.address);
-      bal1 = toBN(bal1);
+      let bal1 = toBN(await getBalance(splitter.address));
       assert(bal1.sub(bal0).eq(BN_1GW), "contract balance mismatch 1");
       const amount = toBN("123456789");
       await splitter.deposit({ from: ALICE, value: amount });
-      let bal2 = await getBalance(splitter.address);
-      bal2 = toBN(bal2);
+      let bal2 = toBN(await getBalance(splitter.address));
       assert(bal2.sub(bal1).eq(amount), "contract balance mismatch 2");
     });
 
