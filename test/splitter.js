@@ -11,8 +11,6 @@ contract("Splitter", async accounts => {
 
   const [ALICE, BOB, CAROL, SOMEONE] = accounts;
 
-  let splitter = null;
-
   describe("check general test cases", async () => {
     it("should set recipients", async () => {
       const splitter = await Splitter.new(BOB, CAROL, { from: ALICE });

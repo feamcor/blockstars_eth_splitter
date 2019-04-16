@@ -23,7 +23,7 @@ contract Splitter is Ownable, Pausable, ReentrancyGuard {
   event FundsSplitted(address indexed by, address indexed to, uint amount);
   event FundsWithdrew(address indexed by, uint amount);
 
-  /// @notice Initialize contract and members that will receive the splitted funds.
+  /// @notice Initialize contract and accounts that will receive the splitted funds.
   /// @param _recipient1 address of first recipient account
   /// @param _recipient2 address of second recipient account
   /// @dev Emits `OwnershipTransferred` and `RecipientSet` events.
