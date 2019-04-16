@@ -13,7 +13,7 @@ contract Actor {
     function deposit(Splitter _splitter, uint _amount) public {
         require(address(_splitter) != address(0x0), "splitter is undefined");
         require(_amount != uint(0), "deposit amount is zero");
-        _splitter.deposit();
+        _splitter.deposit.value(_amount);
     }
 
     function withdraw(Splitter _splitter) public {
@@ -34,6 +34,7 @@ contract TestSplitter {
         Actor _carol = new Actor();
         uint _deposit = 1_000_000 wei;
         Splitter _splitter = _alice.newSplitter(address(_bob), address(_carol));
+        Assert.balanceIsZero(address(_splitter), "initial balance is not zero");
         _alice.deposit(_splitter, _deposit);
         Assert.balanceEqual(address(_splitter), _deposit, "balance mismatch");
     }
