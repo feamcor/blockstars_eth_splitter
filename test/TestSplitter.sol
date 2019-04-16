@@ -17,6 +17,7 @@ contract TestSplitter {
         Actor _carol = new Actor();
         uint _deposit = 1_000_000 wei;
         Splitter _splitter = _alice.newSplitter(address(_bob), address(_carol));
+        Assert.balanceIsZero(address(_splitter), "initial balance is not zero");
         _alice.deposit(_splitter, _deposit);
         Assert.balanceEqual(address(_splitter), _deposit, "balance mismatch");
     }

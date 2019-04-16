@@ -115,3 +115,5 @@ module.exports = {
     }
   }
 };
+
+module.exports.networks.development = module.exports.networks.ganachecli;
