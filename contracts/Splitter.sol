@@ -17,7 +17,7 @@ contract Splitter is Ownable, Pausable, ReentrancyGuard {
   uint public balance2;
 
   event RecipientSet(address indexed by, address indexed recipient);
-  event FundsDeposited(address indexed by, uint amount);
+  event FundsTransferred(address indexed by, uint amount);
   event FundsSplitted(address indexed by, address indexed to, uint amount);
   event FundsWithdrew(address indexed by, uint amount);
 
@@ -35,16 +35,16 @@ contract Splitter is Ownable, Pausable, ReentrancyGuard {
     emit RecipientSet(msg.sender, _recipient2);
   }
 
-  /// @notice Deposit and split funds among the recipient accounts.
+  /// @notice Split funds transferred among the recipient accounts.
   /// @notice Any remainder resulting from split will be added to 1st recipient. 
   /// @dev Emits `FundsDeposited` and `FundsSplitted` events.
-  function deposit() external payable whenNotPaused onlyOwner nonReentrant {
+  function split() external payable whenNotPaused onlyOwner nonReentrant {
     require(msg.value != uint(0), "no funds provided");
     uint _split2 = msg.value.div(2);
     uint _split1 = _split2.add(msg.value.mod(2));
     balance2 = balance2.add(_split2);
     balance1 = balance1.add(_split1);
-    emit FundsDeposited(msg.sender, msg.value);
+    emit FundsTransferred(msg.sender, msg.value);
     emit FundsSplitted(msg.sender, recipient2, _split2);
     emit FundsSplitted(msg.sender, recipient1, _split1);
   }

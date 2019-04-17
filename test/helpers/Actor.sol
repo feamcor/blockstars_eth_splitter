@@ -10,10 +10,10 @@ contract Actor {
         return new Splitter(_r1, _r2);
     }
 
-    function deposit(Splitter _splitter, uint _amount) public {
+    function split(Splitter _splitter, uint _amount) public {
         require(address(_splitter) != address(0x0), "splitter is undefined");
         require(_amount != uint(0), "deposit amount is zero");
-        _splitter.deposit.value(_amount)();
+        _splitter.split.value(_amount)();
     }
 
     function withdraw(Splitter _splitter) public {

@@ -28,7 +28,7 @@ contract TestSplitter {
         Assert.balanceEqual(address(_bob), 1 szabo, "transfer mismatch (bob)");
         address(_carol).transfer(1 szabo);
         Assert.balanceEqual(address(_carol), 1 szabo, "transfer mismatch (carol)");
-        _alice.deposit(_splitter, 2 szabo);
+        _alice.split(_splitter, 2 szabo);
         Assert.balanceEqual(address(_splitter), 2 szabo, "deposit mismatch (splitter)");
         _bob.withdraw(_splitter);
         Assert.balanceEqual(address(_bob), 2 szabo, "withdraw mismatch (bob)");

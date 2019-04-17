@@ -52,15 +52,15 @@ contract("Splitter", async accounts => {
       );
     });
 
-    it("should revert when non-owner perform a deposit", async () => {
+    it("should revert when non-owner perform a split", async () => {
       const splitter = await Splitter.new(BOB, CAROL, { from: ALICE });
-      await reverts(splitter.deposit({ from: SOMEONE, value: BN_1GW }));
+      await reverts(splitter.split({ from: SOMEONE, value: BN_1GW }));
     });
 
-    it("should deposit and split funds", async () => {
+    it("should split transferred funds", async () => {
       const splitter = await Splitter.new(BOB, CAROL, { from: ALICE });
-      const result = await splitter.deposit({ from: ALICE, value: BN_1GW });
-      await eventEmitted(result, "FundsDeposited", log => {
+      const result = await splitter.split({ from: ALICE, value: BN_1GW });
+      await eventEmitted(result, "FundsTransferred", log => {
         return log.by === ALICE && log.amount.eq(BN_1GW);
       });
       await eventEmitted(result, "FundsSplitted", log => {
@@ -78,13 +78,13 @@ contract("Splitter", async accounts => {
       assert(balance.eq(BN_HGW), "member 1 balance mismatch");
     });
 
-    it("should deposit, split funds and give remainder to 1st recipient", async () => {
+    it("should split transferred funds and give remainder to 1st recipient", async () => {
       const splitter = await Splitter.new(BOB, CAROL, { from: ALICE });
       const value = toBN("333");
       const amount1 = toBN("167");
       const amount2 = toBN("166");
-      const result = await splitter.deposit({ from: ALICE, value: value });
-      await eventEmitted(result, "FundsDeposited", log => {
+      const result = await splitter.split({ from: ALICE, value: value });
+      await eventEmitted(result, "FundsTransferred", log => {
         return log.by === ALICE && log.amount.eq(value);
       });
       await eventEmitted(result, "FundsSplitted", log => {
@@ -102,29 +102,29 @@ contract("Splitter", async accounts => {
       assert(balance.eq(amount2), "member 1 balance mismatch");
     });
 
-    it("should revert when deposit value is zero", async () => {
+    it("should revert when split transfer value is zero", async () => {
       const splitter = await Splitter.new(BOB, CAROL, { from: ALICE });
       await reverts(
-        splitter.deposit({ from: ALICE, value: BN_0 }),
+        splitter.split({ from: ALICE, value: BN_0 }),
         "no funds provided"
       );
     });
 
-    it("should increase contract balance upon deposit", async () => {
+    it("should increase contract balance upon split", async () => {
       const splitter = await Splitter.new(BOB, CAROL, { from: ALICE });
       let bal0 = toBN(await getBalance(splitter.address));
-      await splitter.deposit({ from: ALICE, value: BN_1GW });
+      await splitter.split({ from: ALICE, value: BN_1GW });
       let bal1 = toBN(await getBalance(splitter.address));
       assert(bal1.sub(bal0).eq(BN_1GW), "contract balance mismatch 1");
       const amount = toBN("123456789");
-      await splitter.deposit({ from: ALICE, value: amount });
+      await splitter.split({ from: ALICE, value: amount });
       let bal2 = toBN(await getBalance(splitter.address));
       assert(bal2.sub(bal1).eq(amount), "contract balance mismatch 2");
     });
 
     it("should allow recipients to withdraw", async () => {
       const splitter = await Splitter.new(BOB, CAROL, { from: ALICE });
-      await splitter.deposit({ from: ALICE, value: BN_1GW });
+      await splitter.split({ from: ALICE, value: BN_1GW });
       const res0 = await splitter.withdraw({ from: BOB });
       await eventEmitted(res0, "FundsWithdrew", log => {
         return log.by === BOB && log.amount.eq(BN_HGW);
