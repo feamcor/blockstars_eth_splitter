@@ -53,6 +53,13 @@ contract("Splitter", async accounts => {
     });
   });
 
+  describe("Function: fallback", async () => {
+    it("should revert on fallback", async () => {
+      const splitter = await Splitter.deployed();
+      await reverts(splitter.sendTransaction({ from: ALICE, value: BN_1GW }));
+    });
+  });
+
   describe("Function: split", async () => {
     it("should revert when non-owner perform a split", async () => {
       const splitter = await Splitter.new(BOB, CAROL, { from: ALICE });
