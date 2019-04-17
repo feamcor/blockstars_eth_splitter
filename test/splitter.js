@@ -11,7 +11,7 @@ contract("Splitter", async accounts => {
 
   const [ALICE, BOB, CAROL, SOMEONE] = accounts;
 
-  describe("check general test cases", async () => {
+  describe("Function: constructor", async () => {
     it("should set recipients", async () => {
       const splitter = await Splitter.new(BOB, CAROL, { from: ALICE });
       const result = await createTransactionResult(
@@ -51,7 +51,9 @@ contract("Splitter", async accounts => {
         "owner cannot be recipient"
       );
     });
+  });
 
+  describe("Function: split", async () => {
     it("should revert when non-owner perform a split", async () => {
       const splitter = await Splitter.new(BOB, CAROL, { from: ALICE });
       await reverts(splitter.split({ from: SOMEONE, value: BN_1GW }));
@@ -121,7 +123,9 @@ contract("Splitter", async accounts => {
       let bal2 = toBN(await getBalance(splitter.address));
       assert(bal2.sub(bal1).eq(amount), "contract balance mismatch 2");
     });
+  });
 
+  describe("Function: withdraw", async () => {
     it("should allow recipients to withdraw", async () => {
       const splitter = await Splitter.new(BOB, CAROL, { from: ALICE });
       await splitter.split({ from: ALICE, value: BN_1GW });
