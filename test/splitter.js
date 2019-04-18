@@ -18,11 +18,10 @@ contract("Splitter", async accounts => {
         splitter,
         splitter.transactionHash
       );
-      await eventEmitted(result, "RecipientSet", log => {
-        return log.by === ALICE && log.recipient === BOB;
-      });
-      await eventEmitted(result, "RecipientSet", log => {
-        return log.by === ALICE && log.recipient === CAROL;
+      await eventEmitted(result, "RecipientsSet", log => {
+        return (
+          log.by === ALICE && log.recipient1 === BOB && log.recipient2 === CAROL
+        );
       });
       let balance = await getBalance(splitter.address);
       balance = toBN(balance);
@@ -69,14 +68,13 @@ contract("Splitter", async accounts => {
     it("should split transferred funds", async () => {
       const splitter = await Splitter.new(BOB, CAROL, { from: ALICE });
       const result = await splitter.split({ from: ALICE, value: BN_1GW });
-      await eventEmitted(result, "FundsTransferred", log => {
-        return log.by === ALICE && log.amount.eq(BN_1GW);
-      });
       await eventEmitted(result, "FundsSplitted", log => {
-        return log.by === ALICE && log.to === BOB && log.amount.eq(BN_HGW);
-      });
-      await eventEmitted(result, "FundsSplitted", log => {
-        return log.by === ALICE && log.to === CAROL && log.amount.eq(BN_HGW);
+        return (
+          log.by === ALICE &&
+          log.deposit.eq(BN_1GW) &&
+          log.amount1.eq(BN_HGW) &&
+          log.amount2.eq(BN_HGW)
+        );
       });
       let balance = await getBalance(splitter.address);
       balance = toBN(balance);
@@ -93,14 +91,13 @@ contract("Splitter", async accounts => {
       const amount1 = toBN("167");
       const amount2 = toBN("166");
       const result = await splitter.split({ from: ALICE, value: value });
-      await eventEmitted(result, "FundsTransferred", log => {
-        return log.by === ALICE && log.amount.eq(value);
-      });
       await eventEmitted(result, "FundsSplitted", log => {
-        return log.by === ALICE && log.to === BOB && log.amount.eq(amount1);
-      });
-      await eventEmitted(result, "FundsSplitted", log => {
-        return log.by === ALICE && log.to === CAROL && log.amount.eq(amount2);
+        return (
+          log.by === ALICE &&
+          log.deposit.eq(value) &&
+          log.amount1.eq(amount1) &&
+          log.amount2.eq(amount2)
+        );
       });
       let balance = await getBalance(splitter.address);
       balance = toBN(balance);
