@@ -76,8 +76,7 @@ contract("Splitter", async accounts => {
           log.amount2.eq(BN_HGW)
         );
       });
-      let balance = await getBalance(splitter.address);
-      balance = toBN(balance);
+      let balance = toBN(await getBalance(splitter.address));
       assert(balance.eq(BN_1GW), "contract balance mismatch");
       balance = await splitter.balance1();
       assert(balance.eq(BN_HGW), "member 0 balance mismatch");
@@ -99,8 +98,7 @@ contract("Splitter", async accounts => {
           log.amount2.eq(amount2)
         );
       });
-      let balance = await getBalance(splitter.address);
-      balance = toBN(balance);
+      let balance = toBN(await getBalance(splitter.address));
       assert(balance.eq(value), "contract balance mismatch");
       balance = await splitter.balance1();
       assert(balance.eq(amount1), "member 0 balance mismatch");
@@ -133,14 +131,47 @@ contract("Splitter", async accounts => {
     it("should allow recipients to withdraw", async () => {
       const splitter = await Splitter.new(BOB, CAROL, { from: ALICE });
       await splitter.split({ from: ALICE, value: BN_1GW });
-      const res0 = await splitter.withdraw({ from: BOB });
-      await eventEmitted(res0, "FundsWithdrew", log => {
+
+      const balance1a = toBN(await getBalance(BOB));
+      const balance2a = toBN(await getBalance(CAROL));
+
+      const result1 = await splitter.withdraw({ from: BOB });
+      await eventEmitted(result1, "FundsWithdrew", log => {
         return log.by === BOB && log.amount.eq(BN_HGW);
       });
-      const res1 = await splitter.withdraw({ from: CAROL });
-      await eventEmitted(res1, "FundsWithdrew", log => {
+
+      const balance1b = toBN(await getBalance(BOB));
+      const gasUsed1 = toBN(result1.receipt.gasUsed);
+      const transaction1 = await web3.eth.getTransaction(result1.tx);
+      const gasPrice1 = toBN(transaction1.gasPrice);
+
+      assert(
+        gasUsed1
+          .mul(gasPrice1)
+          .add(balance1b)
+          .sub(balance1a)
+          .eq(BN_HGW),
+        "contract balance mismatch 1"
+      );
+
+      const result2 = await splitter.withdraw({ from: CAROL });
+      await eventEmitted(result2, "FundsWithdrew", log => {
         return log.by === CAROL && log.amount.eq(BN_HGW);
       });
+
+      const balance2b = toBN(await getBalance(CAROL));
+      const gasUsed2 = toBN(result2.receipt.gasUsed);
+      const transaction2 = await web3.eth.getTransaction(result2.tx);
+      const gasPrice2 = toBN(transaction2.gasPrice);
+
+      assert(
+        gasUsed2
+          .mul(gasPrice2)
+          .add(balance2b)
+          .sub(balance2a)
+          .eq(BN_HGW),
+        "contract balance mismatch 2"
+      );
     });
 
     it("should revert when recipient balance is zero", async () => {
