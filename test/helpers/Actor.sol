@@ -3,28 +3,23 @@ pragma solidity 0.5.2;
 import "../../contracts/Splitter.sol";
 
 contract Actor {
-    event SplitterInstantiated(address indexed by, address splitter, address indexed recipient1, address indexed recipient2);
-    event SplitFired(address indexed by, uint amount);
-    event WithdrawFired(address indexed by);
 
-    function() external payable {}
+    event FundsReceived(address from, uint value);
 
-    function newSplitter(address _r1, address _r2) public returns(Splitter) {
-        Splitter _splitter = new Splitter(_r1, _r2);
-        emit SplitterInstantiated(address(this), address(_splitter), _r1, _r2);
-        return _splitter;
+    function() external payable {
+        emit FundsReceived(msg.sender, msg.value);
     }
-
-    function split(Splitter _splitter, uint _amount) public {
-        require(address(_splitter) != address(0x0), "splitter is undefined");
-        require(_amount != uint(0), "deposit amount is zero");
-        _splitter.split.value(_amount)();
-        emit SplitFired(address(this), _amount);
+ 
+    function split(Splitter _splitter, uint _value, address _first, address _second) public {
+        require(address(_splitter) != address(0x0), "splitter is empty");
+        require(_value != uint(0), "value to split is zero");
+        require(_first != address(0x0), "1st recipient is empty");
+        require(_second != address(0x0), "2nd recipient is empty");
+        _splitter.split.value(_value)(_first, _second);
     }
 
     function withdraw(Splitter _splitter) public {
-        require(address(_splitter) != address(0x0), "splitter is undefined");
+        require(address(_splitter) != address(0x0), "splitter is empty");
         _splitter.withdraw();
-        emit WithdrawFired(address(this));
     }
 }
