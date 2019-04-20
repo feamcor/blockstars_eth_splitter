@@ -1,5 +1,5 @@
 const truffleAssert = require("truffle-assertions");
-const { createTransactionResult, eventEmitted, reverts } = truffleAssert;
+const { eventEmitted, reverts } = truffleAssert;
 const { toBN, toWei } = web3.utils;
 const { getBalance } = web3.eth;
 const Splitter = artifacts.require("Splitter");
