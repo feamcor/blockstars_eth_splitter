@@ -97,6 +97,7 @@ module.exports = {
 
   // Set default mocha options here, use special reporters etc.
   mocha: {
+    enableTimeouts: true // might have to disable for public/private nets
     // timeout: 100000
   },
 
