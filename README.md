@@ -1,9 +1,9 @@
 # Splitter
 
-- Course: B9lab Blockstars Certified Ethereum Developer Course
+- Course: [B9lab](https://b9lab.com) [Blockstars Certified Ethereum Developer Course](https://blockstars.b9lab.com)
 - Cohort: 2019 BLOCKSTARS-ETH-1
 - Module: 5
-- Author: Fábio Corrêa (feamcor)
+- Author: Fábio Corrêa ([feamcor](https://github.com/feamcor))
 
 ## INTRODUCTION
 
