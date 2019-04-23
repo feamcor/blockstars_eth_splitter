@@ -13,10 +13,9 @@ contract Splitter is Pausable {
 
     event FundsSplitted(
         address indexed from, 
-        uint value,
         address indexed first, 
-        uint value1st,
         address indexed second, 
+        uint value1st,
         uint value2nd);
     event FundsWithdrew(address indexed by, uint balance);
 
@@ -38,7 +37,7 @@ contract Splitter is Pausable {
         uint _value1st = _value2nd.add(msg.value.mod(2));
         balances[_second] = balances[_second].add(_value2nd);
         balances[_first] = balances[_first].add(_value1st);
-        emit FundsSplitted(msg.sender, msg.value, _first, _value1st, _second, _value2nd);
+        emit FundsSplitted(msg.sender, _first, _second, _value1st, _value2nd);
     }
 
     /// @notice Withdraw recipient accumulated balance.

@@ -85,10 +85,9 @@ contract("Splitter", async accounts => {
       await eventEmitted(result, "FundsSplitted", log => {
         return (
           log.from === ALICE &&
-          log.value.eq(BN_1GW) &&
           log.first === BOB &&
-          log.value1st.eq(BN_HGW) &&
           log.second === CAROL &&
+          log.value1st.eq(BN_HGW) &&
           log.value2nd.eq(BN_HGW)
         );
       });
@@ -124,10 +123,9 @@ contract("Splitter", async accounts => {
       await eventEmitted(result, "FundsSplitted", log => {
         return (
           log.from === ALICE &&
-          log.value.eq(value) &&
           log.first === BOB &&
-          log.value1st.eq(value1) &&
           log.second === CAROL &&
+          log.value1st.eq(value1) &&
           log.value2nd.eq(value2)
         );
       });
