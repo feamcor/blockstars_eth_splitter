@@ -17,12 +17,17 @@
 
 **Splitter** exposes the following functions:
 
-- `split` - divides, equally, between two recipient accounts, all the **ether** transferred by sender. In case the transferred amount is uneven, the exceeding **1 wei** is given to 1st recipient account. Sender pays the **gas** for calling this function. Input parameters:
+- `split` - divides, between two recipient accounts, the **ether** transferred by sender on the transaction (i.e. `msg.value`). In case the transferred amount is uneven, the exceeding **1 wei** is given to 1st recipient account. Sender pays the **gas** for calling this function. Input parameters:
 
   - `first` - address of the 1st recipient account
   - `second` - address of the 2nd recipient account
 
-- `withdraw` - transfer to sender its balance accumulated by previouses executions of `split`. Sender pays the **gas** for calling this function.
+- `splitBalance` - divides, between two recipient accounts, the **balance** of the sender held by the contract. In case the balance is uneven, the exceeding **1 wei** is left with the sender. Sender pays the **gas** for calling this function. Input parameters:
+
+  - `first` - address of the 1st recipient account
+  - `second` - address of the 2nd recipient account
+
+- `withdraw` - transfer to sender its balance accumulated from previouses executions of `split` and `splitBalance`. Sender pays the **gas** for calling this function.
 
 ### EVENTS
 
@@ -36,7 +41,14 @@
   - `value1st` - amount credited to `first`
   - `value2nd` - amount credited to `second`
 
-- `FundsWithdrew` - funds were transferred to recipient account. Output parameters:
+- `BalanceSplitted` - balance was divided and credited to recipient accounts. Output parameters:
+
+  - `from` - address of the account which sent balance to recipients
+  - `first` - address of 1st recipient account
+  - `second` - address of 2nd recipient account
+  - `value` - amount credited to recipient accounts
+
+- `BalanceWithdrew` - funds were transferred to recipient account. Output parameters:
   - `by` - address of account who requested withdraw
   - `balance` - outstanding balance of the requestor
 

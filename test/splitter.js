@@ -36,7 +36,7 @@ contract("Splitter", async accounts => {
     it("should revert when split transfer value is zero", async () => {
       await reverts(
         SPLITTER.split(BOB, CAROL, { from: ALICE, value: BN_0 }),
-        "no funds provided"
+        "value is zero"
       );
     });
 
@@ -146,14 +146,124 @@ contract("Splitter", async accounts => {
     });
   });
 
+  describe("Function: splitBalance", async () => {
+    it("should revert when split balance is zero", async () => {
+      await reverts(
+        SPLITTER.splitBalance(BOB, CAROL, { from: SOMEONE }),
+        "balance is zero"
+      );
+    });
+
+    it("should revert when any recipient is empty", async () => {
+      await reverts(
+        SPLITTER.splitBalance(BOB, ZEROx0, { from: ALICE }),
+        "recipients cannot be empty"
+      );
+      await reverts(
+        SPLITTER.splitBalance(ZEROx0, CAROL, { from: ALICE }),
+        "recipients cannot be empty"
+      );
+      await reverts(
+        SPLITTER.splitBalance(ZEROx0, ZEROx0, { from: ALICE }),
+        "recipients cannot be empty"
+      );
+    });
+
+    it("should revert when recipient is duplicated", async () => {
+      await reverts(
+        SPLITTER.splitBalance(BOB, BOB, { from: ALICE }),
+        "recipients must be different"
+      );
+    });
+
+    it("should revert when sender is a recipient", async () => {
+      await reverts(
+        SPLITTER.splitBalance(BOB, ALICE, { from: ALICE }),
+        "sender cannot be recipient"
+      );
+      await reverts(
+        SPLITTER.splitBalance(ALICE, CAROL, { from: ALICE }),
+        "sender cannot be recipient"
+      );
+    });
+
+    it("should split balance", async () => {
+      const balance0a = await SPLITTER.balances(CAROL, { from: SOMEONE });
+      const balance1a = await SPLITTER.balances(ALICE, { from: SOMEONE });
+      const balance2a = await SPLITTER.balances(BOB, { from: SOMEONE });
+
+      const splitQ = balance0a.div(toBN("2"));
+      const splitR = balance0a.mod(toBN("2"));
+
+      const result = await SPLITTER.splitBalance(ALICE, BOB, { from: CAROL });
+      await eventEmitted(result, "BalanceSplitted", log => {
+        return (
+          log.from === CAROL &&
+          log.first === ALICE &&
+          log.second === BOB &&
+          log.value.eq(splitQ)
+        );
+      });
+
+      const balance0b = await SPLITTER.balances(CAROL, { from: SOMEONE });
+      const balance1b = await SPLITTER.balances(ALICE, { from: SOMEONE });
+      const balance2b = await SPLITTER.balances(BOB, { from: SOMEONE });
+
+      assert(balance0b.eq(splitR), "sender balance mismatch");
+      assert(
+        balance1b.sub(balance1a).eq(splitQ),
+        "1st recipient balance mismatch"
+      );
+      assert(
+        balance2b.sub(balance2a).eq(splitQ),
+        "2nd recipient balance mismatch"
+      );
+    });
+
+    it("should split balance and remainder stay with sender", async () => {
+      const balance0a = await SPLITTER.balances(BOB, { from: SOMEONE });
+      const balance1a = await SPLITTER.balances(ALICE, { from: SOMEONE });
+      const balance2a = await SPLITTER.balances(CAROL, { from: SOMEONE });
+
+      const splitQ = balance0a.div(toBN("2"));
+      const splitR = balance0a.mod(toBN("2"));
+
+      const result = await SPLITTER.splitBalance(ALICE, CAROL, { from: BOB });
+      await eventEmitted(result, "BalanceSplitted", log => {
+        return (
+          log.from === BOB &&
+          log.first === ALICE &&
+          log.second === CAROL &&
+          log.value.eq(splitQ)
+        );
+      });
+
+      const balance0b = await SPLITTER.balances(BOB, { from: SOMEONE });
+      const balance1b = await SPLITTER.balances(ALICE, { from: SOMEONE });
+      const balance2b = await SPLITTER.balances(CAROL, { from: SOMEONE });
+
+      assert(balance0b.eq(splitR), "sender balance mismatch");
+      assert(
+        balance1b.sub(balance1a).eq(splitQ),
+        "1st recipient balance mismatch"
+      );
+      assert(
+        balance2b.sub(balance2a).eq(splitQ),
+        "2nd recipient balance mismatch"
+      );
+    });
+  });
+
   describe("Function: withdraw", async () => {
     it("should allow recipients to withdraw", async () => {
-      const split1 = await SPLITTER.balances(BOB, { from: ALICE });
-      const split2 = await SPLITTER.balances(CAROL, { from: ALICE });
+      await SPLITTER.splitBalance(BOB, CAROL, { from: ALICE });
+
+      const split1 = await SPLITTER.balances(BOB, { from: SOMEONE });
+      const split2 = await SPLITTER.balances(CAROL, { from: SOMEONE });
 
       const balance1a = toBN(await getBalance(BOB));
       const result1b = await SPLITTER.withdraw({ from: BOB });
-      await eventEmitted(result1b, "FundsWithdrew", log => {
+      await eventEmitted(result1b, "BalanceWithdrew", log => {
         return log.by === BOB && log.balance.eq(split1);
       });
 
@@ -172,7 +282,7 @@ contract("Splitter", async accounts => {
 
       const balance2a = toBN(await getBalance(CAROL));
       const result2b = await SPLITTER.withdraw({ from: CAROL });
-      await eventEmitted(result2b, "FundsWithdrew", log => {
+      await eventEmitted(result2b, "BalanceWithdrew", log => {
         return log.by === CAROL && log.balance.eq(split2);
       });
 

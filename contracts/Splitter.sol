@@ -12,27 +12,39 @@ contract Splitter is Pausable {
     mapping(address => uint) public balances;
 
     event FundsSplitted(
-        address indexed from, 
-        address indexed first, 
-        address indexed second, 
+        address indexed from,
+        address indexed first,
+        address indexed second,
         uint value1st,
-        uint value2nd);
-    event FundsWithdrew(address indexed by, uint balance);
+        uint value2nd
+    );
+    event BalanceSplitted(
+        address indexed from,
+        address indexed first,
+        address indexed second,
+        uint value
+    );
+    event BalanceWithdrew(address indexed by, uint balance);
 
-    /// @notice Split funds transferred among recipient accounts.
-    /// @notice Any remainder resulting from split will be added to 1st recipient. 
-    /// @param _first address of first recipient account
-    /// @param _second address of second recipient account
-    /// @dev Emits `FundsSplitted` event.
-    function split(address _first, address _second) 
-        external 
-        payable 
-        whenNotPaused 
-    {
-        require(msg.value != uint(0), "no funds provided");
+    modifier validRecipients(address _first, address _second) {
         require(_first != address(0x0) && _second != address(0x0), "recipients cannot be empty");
         require(_first != _second, "recipients must be different");
         require(_first != msg.sender && _second != msg.sender, "sender cannot be recipient");
+        _;
+    }
+
+    /// @notice Split funds transferred by sender between recipient accounts.
+    /// @notice Any remainder resulting from split will be added to 1st recipient.
+    /// @param _first address of first recipient account
+    /// @param _second address of second recipient account
+    /// @dev Emits `FundsSplitted` event.
+    function split(address _first, address _second)
+        external
+        payable
+        whenNotPaused
+        validRecipients(_first, _second)
+    {
+        require(msg.value != uint(0), "value is zero");
         uint _value2nd = msg.value.div(2);
         uint _value1st = _value2nd.add(msg.value.mod(2));
         balances[_second] = balances[_second].add(_value2nd);
@@ -40,13 +52,32 @@ contract Splitter is Pausable {
         emit FundsSplitted(msg.sender, _first, _second, _value1st, _value2nd);
     }
 
+    /// @notice Split sender's balance between recipient accounts.
+    /// @notice Any remainder resulting from split will be kept on sender's balance.
+    /// @param _first address of first recipient account
+    /// @param _second address of second recipient account
+    /// @dev Emits `BalanceSplitted` event.
+    function splitBalance(address _first, address _second)
+        external
+        whenNotPaused
+        validRecipients(_first, _second)
+    {
+        uint _balance = balances[msg.sender];
+        require(_balance != uint(0), "balance is zero");
+        uint _value = _balance.div(2);
+        balances[msg.sender] = _balance.mod(2);
+        balances[_second] = balances[_second].add(_value);
+        balances[_first] = balances[_first].add(_value);
+        emit BalanceSplitted(msg.sender, _first, _second, _value);
+    }
+
     /// @notice Withdraw recipient accumulated balance.
-    /// @dev Emits `FundsWithdrew` event.
+    /// @dev Emits `BalanceWithdrew` event.
     function withdraw() external whenNotPaused {
         uint _balance = balances[msg.sender];
-        require(_balance != 0, "balance is zero");
+        require(_balance != uint(0), "balance is zero");
         balances[msg.sender] = uint(0);
         msg.sender.transfer(_balance);
-        emit FundsWithdrew(msg.sender, _balance);
+        emit BalanceWithdrew(msg.sender, _balance);
     }
 }
