@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Splitter",
+  "name": "Split ether between two recipient accounts",
   "icons": [
     {
       "src": "favicon.ico",
