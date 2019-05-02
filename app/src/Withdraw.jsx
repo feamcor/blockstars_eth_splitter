@@ -1,12 +1,10 @@
 import React, { Component } from "react";
 
-class PauseUnpause extends Component {
+class Withdraw extends Component {
   state = { txStackId: null };
 
   handleOnClick = event => {
-    const txStackId = this.props.isPaused
-      ? this.props.unpause.cacheSend()
-      : this.props.pause.cacheSend();
+    const txStackId = this.props.withdraw.cacheSend();
     this.setState({ txStackId });
   };
 
@@ -17,40 +15,36 @@ class PauseUnpause extends Component {
   }
 
   render() {
-    const buttonClass = this.props.isPauser
-      ? this.props.isPaused
-        ? "btn btn-success btn-block"
-        : "btn btn-danger btn-block"
-      : "btn btn-light btn-block";
-    const actionLabel = this.props.isPaused ? "UNPAUSE" : "PAUSE";
+    const buttonClass = this.props.isPaused
+      ? "btn btn-light btn-block"
+      : "btn btn-info btn-block";
     return (
       <div className="card shadow bg-light text-center">
         <div className="card-header">
-          {this.props.isPauser && (
+          {!this.props.isPaused && (
             <button
               type="button"
               className={buttonClass}
               onClick={this.handleOnClick}
             >
-              <strong>{actionLabel}</strong>
+              <strong>WITHDRAW</strong>
             </button>
           )}
-          {!this.props.isPauser && (
+          {this.props.isPaused && (
             <button
               type="button"
               className={buttonClass}
               onClick={this.handleOnClick}
               disabled
             >
-              <strong>{actionLabel}</strong>
+              <strong>WITHDRAW</strong>
             </button>
           )}
         </div>
         <span className="card-body">
-          When paused, <strong>split</strong> and <strong>withdraw</strong>{" "}
-          functions are disabled. Only accounts with <strong>Pauser</strong>{" "}
-          role (see <code>Is a Pauser?</code> above) can pause/unpause the
-          contract.
+          The contract will transfer to the account, the balance accumulated
+          from previous <strong>split</strong> function execution. No withdraw
+          on behalf of another account is allowed.
         </span>
         <span className="card-footer font-weight-bold text-uppercase">
           {this.props.getTxStatus(this.state.txStackId)}
@@ -60,4 +54,4 @@ class PauseUnpause extends Component {
   }
 }
 
-export default PauseUnpause;
+export default Withdraw;

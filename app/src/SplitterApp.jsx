@@ -3,6 +3,7 @@ import NavBar from "./NavBar";
 import AccountInfo from "./AccountInfo";
 import AccountBalance from "./AccountBalance";
 import PauseUnpause from "./PauseUnpause";
+import Withdraw from "./Withdraw";
 
 class SplitterApp extends Component {
   state = {
@@ -146,11 +147,18 @@ class SplitterApp extends Component {
             </div>
           </div>
           <div className="row mt-3">
-            <div className="col-4">
+            <div className="col-6">
               <PauseUnpause
                 pause={methods.pause}
                 unpause={methods.unpause}
                 isPauser={accountIsPauser}
+                isPaused={contractIsPaused}
+                getTxStatus={this.getTxStatus}
+              />
+            </div>
+            <div className="col-6">
+              <Withdraw
+                withdraw={methods.withdraw}
                 isPaused={contractIsPaused}
                 getTxStatus={this.getTxStatus}
               />
