@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import NavBar from "./NavBar";
 import AccountInfo from "./AccountInfo";
 import AccountBalance from "./AccountBalance";
+import PauseUnpause from "./PauseUnpause";
 
 class SplitterApp extends Component {
   state = {
@@ -101,6 +102,7 @@ class SplitterApp extends Component {
     const account = this.props.drizzleState.accounts[0];
     const accountBalance = this.props.drizzleState.accountBalances[account];
 
+    const { methods } = this.props.drizzle.contracts.Splitter;
     const results = this.props.drizzleState.contracts.Splitter;
 
     const r_isPauser = results.isPauser[this.state.k_isPauser];
@@ -140,6 +142,17 @@ class SplitterApp extends Component {
               <AccountBalance
                 account={account}
                 balance={this.fromWeiToEther(accountSplitBalance)}
+              />
+            </div>
+          </div>
+          <div className="row mt-3">
+            <div className="col-4">
+              <PauseUnpause
+                pause={methods.pause}
+                unpause={methods.unpause}
+                isPauser={accountIsPauser}
+                isPaused={contractIsPaused}
+                getTxStatus={this.getTxStatus}
               />
             </div>
           </div>
