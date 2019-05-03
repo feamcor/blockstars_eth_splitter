@@ -5,8 +5,7 @@ class AccountInfo extends PureComponent {
     return (
       <div className="card shadow text-white bg-primary">
         <h5 className="card-header">
-          <strong>ACCOUNT </strong>
-          {this.props.account}
+          <strong>ACCOUNT</strong> {this.props.account}
         </h5>
         <div className="card-body">
           <p className="card-text">

@@ -27,7 +27,7 @@ class Withdraw extends Component {
               className={buttonClass}
               onClick={this.handleOnClick}
             >
-              <strong>WITHDRAW</strong>
+              <strong>WITHDRAW BALANCE</strong>
             </button>
           )}
           {this.props.isPaused && (
@@ -37,14 +37,17 @@ class Withdraw extends Component {
               onClick={this.handleOnClick}
               disabled
             >
-              <strong>WITHDRAW</strong>
+              <strong>WITHDRAW BALANCE</strong>
             </button>
           )}
         </div>
         <span className="card-body">
-          The contract will transfer to the account, the balance accumulated
-          from previous <strong>split</strong> function execution. No withdraw
-          on behalf of another account is allowed.
+          <p>
+            Transfer, to the account <code>{this.props.account}</code>, a
+            balance of <code>{this.props.balance}</code> accumulated from
+            previous <strong>split</strong> function execution.
+          </p>
+          <p>No withdraw on behalf of another account is allowed.</p>
         </span>
         <span className="card-footer font-weight-bold text-uppercase">
           {this.props.getTxStatus(this.state.txStackId)}

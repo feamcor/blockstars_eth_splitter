@@ -5,8 +5,7 @@ class AccountBalance extends PureComponent {
     return (
       <div className="card shadow text-white bg-dark">
         <h5 className="card-header">
-          <strong>BALANCE HELD FOR ACCOUNT </strong>
-          {this.props.account}
+          <strong>ACCOUNT ACCUMULATED BALANCE ON SPLITTER</strong>
         </h5>
         <div className="card-body">
           <p className="card-text">
