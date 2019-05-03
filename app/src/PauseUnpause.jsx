@@ -32,7 +32,7 @@ class PauseUnpause extends Component {
               className={buttonClass}
               onClick={this.handleOnClick}
             >
-              <strong>{actionLabel}</strong>
+              <strong>{actionLabel} SPLITTER</strong>
             </button>
           )}
           {!this.props.isPauser && (
@@ -47,10 +47,14 @@ class PauseUnpause extends Component {
           )}
         </div>
         <span className="card-body">
-          When paused, <strong>split</strong> and <strong>withdraw</strong>{" "}
-          functions are disabled. Only accounts with <strong>Pauser</strong>{" "}
-          role (see <code>Is a Pauser?</code> above) can pause/unpause the
-          contract.
+          <p>
+            When paused, <strong>split</strong> and <strong>withdraw</strong>{" "}
+            functions are disabled.
+          </p>
+          <p>
+            Only accounts with <strong>Pauser</strong> role (see{" "}
+            <code>Is a Pauser?</code> above) can pause/unpause the contract.
+          </p>
         </span>
         <span className="card-footer font-weight-bold text-uppercase">
           {this.props.getTxStatus(this.state.txStackId)}
