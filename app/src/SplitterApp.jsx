@@ -1,4 +1,8 @@
 import React, { Component } from "react";
+
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import NavBar from "./NavBar";
 import AccountInfo from "./AccountInfo";
 import AccountBalance from "./AccountBalance";
@@ -127,6 +131,7 @@ class SplitterApp extends Component {
 
     return (
       <React.Fragment>
+        <ToastContainer />
         <NavBar address={address} isPaused={contractIsPaused} />
         <div className="container">
           <div className="row mt-3 justify-content-md-center">
@@ -141,7 +146,6 @@ class SplitterApp extends Component {
           <div className="row mt-3 justify-content-md-center">
             <div className="col">
               <AccountBalance
-                account={account}
                 balance={this.fromWeiToEther(accountSplitBalance)}
               />
             </div>
@@ -158,6 +162,8 @@ class SplitterApp extends Component {
             </div>
             <div className="col-6">
               <Withdraw
+                account={account}
+                balance={this.fromWeiToEther(accountSplitBalance)}
                 withdraw={methods.withdraw}
                 isPaused={contractIsPaused}
                 getTxStatus={this.getTxStatus}
