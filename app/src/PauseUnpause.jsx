@@ -59,7 +59,7 @@ class PauseUnpause extends Component {
               onClick={this.handleOnClick}
               disabled
             >
-              <strong>{actionLabel}</strong>
+              <strong>{actionLabel} SPLITTER</strong>
             </button>
           )}
         </div>

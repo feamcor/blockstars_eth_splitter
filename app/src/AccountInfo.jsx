@@ -5,12 +5,12 @@ class AccountInfo extends PureComponent {
     return (
       <div className="card shadow text-white bg-primary">
         <h5 className="card-header">
-          <strong>ACCOUNT</strong> {this.props.account}
+          <strong>ACCOUNT</strong> <small>{this.props.account}</small>
         </h5>
         <div className="card-body">
           <p className="card-text">
-            <strong>Balance (ETH): </strong>
-            {this.props.balance}
+            <strong>Balance on blockchain: Ξ </strong>
+            {this.props.balanceAccount}
           </p>
           <p className="card-text">
             <strong>Is a Pauser? </strong>
@@ -18,6 +18,10 @@ class AccountInfo extends PureComponent {
               {this.props.isPauser === true && " YES "}
               {this.props.isPauser === false && " NO "}
             </span>
+          </p>
+          <p className="card-text">
+            <strong>Balance on Splitter: Ξ </strong>
+            {this.props.balanceSplitter}
           </p>
         </div>
       </div>

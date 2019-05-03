@@ -5,7 +5,6 @@ import "react-toastify/dist/ReactToastify.css";
 
 import NavBar from "./NavBar";
 import AccountInfo from "./AccountInfo";
-import AccountBalance from "./AccountBalance";
 import PauseUnpause from "./PauseUnpause";
 import Withdraw from "./Withdraw";
 
@@ -134,18 +133,12 @@ class SplitterApp extends Component {
         <NavBar address={address} isPaused={contractIsPaused} />
         <div className="container">
           <div className="row mt-3 justify-content-md-center">
-            <div className="col">
+            <div className="col-6">
               <AccountInfo
                 account={account}
-                balance={this.fromWeiToEther(accountBalance)}
+                balanceAccount={this.fromWeiToEther(accountBalance)}
+                balanceSplitter={this.fromWeiToEther(accountSplitBalance)}
                 isPauser={accountIsPauser}
-              />
-            </div>
-          </div>
-          <div className="row mt-3 justify-content-md-center">
-            <div className="col">
-              <AccountBalance
-                balance={this.fromWeiToEther(accountSplitBalance)}
               />
             </div>
           </div>

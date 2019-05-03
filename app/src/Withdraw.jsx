@@ -60,7 +60,7 @@ class Withdraw extends Component {
         <span className="card-body">
           <p>
             Transfer, to the account <code>{this.props.account}</code>, a
-            balance of <code>{this.props.balance}</code> ETH accumulated from
+            balance of <code>Ξ {this.props.balance}</code> accumulated from
             previous <strong>split</strong> function execution.
           </p>
           <p>No withdraw on behalf of another account is allowed.</p>

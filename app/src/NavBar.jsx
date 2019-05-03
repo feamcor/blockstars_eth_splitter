@@ -14,7 +14,7 @@ class NavBar extends PureComponent {
         />
         <h4 className="nav-text">
           {this.props.isPaused && (
-            <span className="badge badge-danger">{" > PAUSED < "}</span>
+            <span className="badge badge-danger">{" PAUSED "}</span>
           )}
         </h4>
         <h2 className="nav-text">
