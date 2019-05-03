@@ -45,9 +45,10 @@ class SplitterApp extends Component {
   };
 
   getTxStatus = txStackId => {
+    if (txStackId === null) return null;
     const { transactions, transactionStack } = this.props.drizzleState;
     const txHash = transactionStack[txStackId];
-    if (!txHash || !transactions[txHash]) return "...";
+    if (!txHash || !transactions[txHash]) return null;
     return transactions[txHash].status;
   };
 
@@ -58,9 +59,7 @@ class SplitterApp extends Component {
         : typeof amount === "number" || typeof amount === "object"
         ? amount.toString()
         : amount;
-    const { fromWei } = this.props.drizzle.web3.utils;
-    const output = `${fromWei(wei, "ether")} ether`;
-    return output;
+    return this.props.drizzle.web3.utils.fromWei(wei, "ether");
   };
 
   componentDidMount() {

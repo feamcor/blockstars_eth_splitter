@@ -1,18 +1,35 @@
 import React, { Component } from "react";
+import { toast } from "react-toastify";
 
 class PauseUnpause extends Component {
-  state = { txStackId: null };
+  state = { txStackId: null, txStatus: null };
 
   handleOnClick = event => {
     const txStackId = this.props.isPaused
       ? this.props.unpause.cacheSend()
       : this.props.pause.cacheSend();
-    this.setState({ txStackId });
+    this.setState({ txStackId, txStatus: null });
   };
 
   componentDidUpdate(prevProps) {
     if (this.props.isPaused !== prevProps.isPaused) {
-      this.setState({ txStackId: null });
+      this.setState({ txStackId: null, txStatus: null });
+    } else {
+      const txStatus = this.props.getTxStatus(this.state.txStackId);
+      if (txStatus !== this.state.txStatus) {
+        this.setState({ txStatus });
+        const message = this.props.isPaused
+          ? `UNPAUSE... ${txStatus}`
+          : `PAUSE... ${txStatus}`;
+        toast.info(message, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true
+        });
+      }
     }
   }
 
@@ -55,9 +72,6 @@ class PauseUnpause extends Component {
             Only accounts with <strong>Pauser</strong> role (see{" "}
             <code>Is a Pauser?</code> above) can pause/unpause the contract.
           </p>
-        </span>
-        <span className="card-footer font-weight-bold text-uppercase">
-          {this.props.getTxStatus(this.state.txStackId)}
         </span>
       </div>
     );

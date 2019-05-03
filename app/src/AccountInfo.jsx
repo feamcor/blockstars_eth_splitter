@@ -9,7 +9,7 @@ class AccountInfo extends PureComponent {
         </h5>
         <div className="card-body">
           <p className="card-text">
-            <strong>Balance: </strong>
+            <strong>Balance (ETH): </strong>
             {this.props.balance}
           </p>
           <p className="card-text">
