@@ -30,10 +30,10 @@ class Withdraw extends Component {
   }
 
   render() {
-    const buttonClass = this.props.isPaused
-      ? "btn btn-light btn-block"
-      : "btn btn-info btn-block";
     const enabled = !this.props.isPaused && this.props.balance !== "0";
+    const buttonClass = enabled
+      ? "btn btn-info btn-block"
+      : "btn btn-light btn-block";
     return (
       <div className="card shadow bg-light text-center">
         <div className="card-header">
