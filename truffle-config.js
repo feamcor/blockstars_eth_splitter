@@ -111,8 +111,8 @@ module.exports = {
   },
 
   mocha: {
-    enableTimeouts: true // might have to disable for public/private nets
-    // timeout: 100000
+    enableTimeouts: true, // might have to disable for public/private nets
+    timeout: 30000
   },
 
   compilers: {
