@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { toast } from "react-toastify";
 
-class PauseUnpause extends Component {
+class Account extends Component {
   state = { txStackId: null, txStatus: null };
 
   handleOnClick = event => {
@@ -19,8 +19,8 @@ class PauseUnpause extends Component {
       if (txStatus !== this.state.txStatus) {
         this.setState({ txStatus });
         const message = this.props.isPaused
-          ? `UNPAUSE... ${txStatus}`
-          : `PAUSE... ${txStatus}`;
+          ? `UNPAUSE ... ${txStatus}`
+          : `PAUSE ... ${txStatus}`;
         toast.info(message, {
           position: "top-right",
           autoClose: 5000,
@@ -40,42 +40,38 @@ class PauseUnpause extends Component {
         : "btn btn-danger btn-block"
       : "btn btn-light btn-block";
     const actionLabel = this.props.isPaused ? "UNPAUSE" : "PAUSE";
+
     return (
-      <div className="card shadow bg-light text-center">
-        <div className="card-header">
-          {this.props.isPauser && (
-            <button
-              type="button"
-              className={buttonClass}
-              onClick={this.handleOnClick}
-            >
-              <strong>{actionLabel} SPLITTER</strong>
-            </button>
-          )}
-          {!this.props.isPauser && (
-            <button
-              type="button"
-              className={buttonClass}
-              onClick={this.handleOnClick}
-              disabled
-            >
-              <strong>{actionLabel} SPLITTER</strong>
-            </button>
-          )}
+      <div className="card shadow text-white bg-primary">
+        <h5 className="card-header">ACCOUNT {this.props.account}</h5>
+        <div className="card-body">
+          <table className="table table-borderless table-hover text-white bg-primary">
+            <tbody>
+              <tr>
+                <td>Balance on Blockchain</td>
+                <td>Ξ {this.props.balanceAccount}</td>
+              </tr>
+              <tr>
+                <td>Balance on Splitter</td>
+                <td>Ξ {this.props.balanceSplitter}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-        <span className="card-body">
-          <p>
-            When paused, <strong>split</strong> and <strong>withdraw</strong>{" "}
-            functions are disabled.
-          </p>
-          <p>
-            Only accounts with <strong>Pauser</strong> role (see{" "}
-            <code>Is a Pauser?</code> above) can pause/unpause the contract.
-          </p>
-        </span>
+        {this.props.isPauser && (
+          <div className="card-footer">
+            <button
+              type="button"
+              className={buttonClass}
+              onClick={this.handleOnClick}
+            >
+              <strong>{actionLabel} SPLITTER</strong>
+            </button>
+          </div>
+        )}
       </div>
     );
   }
 }
 
-export default PauseUnpause;
+export default Account;

@@ -1,12 +1,12 @@
 import React, { Component } from "react";
 
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import NavBar from "./NavBar";
-import AccountInfo from "./AccountInfo";
-import PauseUnpause from "./PauseUnpause";
+import AccountInfo from "./Account";
 import Withdraw from "./Withdraw";
+import SplitFunds from "./SplitFunds";
 
 class SplitterApp extends Component {
   state = {
@@ -14,7 +14,9 @@ class SplitterApp extends Component {
     contractDidChange: false,
     k_isPauser: null,
     k_balances: null,
-    k_paused: null
+    k_paused: null,
+    firstRecipient: "",
+    secondRecipient: ""
   };
 
   f_isPauser = account => {
@@ -124,44 +126,116 @@ class SplitterApp extends Component {
     }
 
     const accountIsPauser = r_isPauser.value;
-    const accountSplitBalance = r_balances.value;
-    const contractIsPaused = r_paused.value;
+    const accountBalanceOnSplitter = r_balances.value;
+    const splitterIsPaused = r_paused.value;
+
+    const noBalance = accountBalance === "0";
+    const noBalanceOnSplitter = accountBalanceOnSplitter === "0";
+    const noBalanceAtAll = noBalance && noBalanceOnSplitter;
 
     return (
       <React.Fragment>
         <ToastContainer />
-        <NavBar address={address} isPaused={contractIsPaused} />
+        <NavBar address={address} isPaused={splitterIsPaused} />
         <div className="container">
-          <div className="row mt-3 justify-content-md-center">
-            <div className="col-6">
+          <div className="row justify-content-md-center mt-3">
+            <div className="col-8">
               <AccountInfo
-                account={account}
-                balanceAccount={this.fromWeiToEther(accountBalance)}
-                balanceSplitter={this.fromWeiToEther(accountSplitBalance)}
-                isPauser={accountIsPauser}
-              />
-            </div>
-          </div>
-          <div className="row mt-3">
-            <div className="col-6">
-              <PauseUnpause
                 pause={methods.pause}
                 unpause={methods.unpause}
-                isPauser={accountIsPauser}
-                isPaused={contractIsPaused}
-                getTxStatus={this.getTxStatus}
-              />
-            </div>
-            <div className="col-6">
-              <Withdraw
                 account={account}
-                balance={this.fromWeiToEther(accountSplitBalance)}
-                withdraw={methods.withdraw}
-                isPaused={contractIsPaused}
+                balanceAccount={this.fromWeiToEther(accountBalance)}
+                balanceSplitter={this.fromWeiToEther(accountBalanceOnSplitter)}
+                isPauser={accountIsPauser}
+                isPaused={splitterIsPaused}
                 getTxStatus={this.getTxStatus}
               />
             </div>
           </div>
+
+          {!splitterIsPaused && !noBalanceOnSplitter && (
+            <div className="row justify-content-md-center mt-3">
+              <div className="col-8">
+                <Withdraw
+                  balance={this.fromWeiToEther(accountBalanceOnSplitter)}
+                  withdraw={methods.withdraw}
+                  isPaused={splitterIsPaused}
+                  getTxStatus={this.getTxStatus}
+                />
+              </div>
+            </div>
+          )}
+
+          {!splitterIsPaused && !noBalanceAtAll && (
+            <div className="row justify-content-md-center mt-3">
+              <div className="col-8">
+                <div className="input-group">
+                  <div className="input-group-prepend">
+                    <span className="input-group-text" id="labelFirst">
+                      1st
+                    </span>
+                  </div>
+                  <input
+                    type="text"
+                    key="firstRecipient"
+                    name="firstRecipient"
+                    value={this.state.firstRecipient}
+                    onChange={this.handleOnChange}
+                    className="form-control"
+                    placeholder="Address of 1st Recipient Account, with 0x prefix"
+                    aria-label="firstRecipient"
+                    aria-describedby="labelFirst"
+                    maxLength="42"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {!splitterIsPaused && !noBalanceAtAll && (
+            <div className="row justify-content-md-center mt-3">
+              <div className="col-8">
+                <div className="input-group">
+                  <div className="input-group-prepend">
+                    <span className="input-group-text" id="labelSecond">
+                      2nd
+                    </span>
+                  </div>
+                  <input
+                    type="text"
+                    key="secondRecipient"
+                    name="secondRecipient"
+                    value={this.state.secondRecipient}
+                    onChange={this.handleOnChange}
+                    className="form-control"
+                    placeholder="Address of 2nd Recipient Account, with 0x prefix"
+                    aria-label="secondRecipient"
+                    aria-describedby="labelSecond"
+                    maxLength="42"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {!splitterIsPaused && !noBalance && (
+            <div className="row justify-content-md-center mt-3">
+              <div className="col-8">
+                <SplitFunds
+                  split={methods.split}
+                  getTxStatus={this.getTxStatus}
+                  toWei={this.props.drizzle.web3.utils.toWei}
+                  isPaused={splitterIsPaused}
+                  account={account}
+                  balance={this.fromWeiToEther(accountBalance)}
+                  first={this.state.firstRecipient}
+                  second={this.state.secondRecipient}
+                />
+              </div>
+            </div>
+          )}
         </div>
       </React.Fragment>
     );

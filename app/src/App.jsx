@@ -2,7 +2,7 @@ import React from "react";
 import { DrizzleContext } from "drizzle-react";
 import SplitterApp from "./SplitterApp";
 
-export default () => (
+export const App = () => (
   <DrizzleContext.Consumer>
     {drizzleContext => {
       const { drizzle, drizzleState, initialized } = drizzleContext;
@@ -15,3 +15,5 @@ export default () => (
     }}
   </DrizzleContext.Consumer>
 );
+
+export default App;

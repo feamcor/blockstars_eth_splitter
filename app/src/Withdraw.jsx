@@ -30,40 +30,23 @@ class Withdraw extends Component {
   }
 
   render() {
-    const enabled = !this.props.isPaused && this.props.balance !== "0";
-    const buttonClass = enabled
-      ? "btn btn-info btn-block"
-      : "btn btn-light btn-block";
     return (
-      <div className="card shadow bg-light text-center">
+      <div className="card shadow bg-dark text-center text-white">
         <div className="card-header">
-          {enabled && (
-            <button
-              type="button"
-              className={buttonClass}
-              onClick={this.handleOnClick}
-            >
-              <strong>WITHDRAW BALANCE</strong>
-            </button>
-          )}
-          {!enabled && (
-            <button
-              type="button"
-              className={buttonClass}
-              onClick={this.handleOnClick}
-              disabled
-            >
-              <strong>WITHDRAW BALANCE</strong>
-            </button>
-          )}
+          <button
+            type="button"
+            className="btn btn-secondary btn-block"
+            onClick={this.handleOnClick}
+          >
+            WITHDRAW BALANCE
+          </button>
         </div>
         <span className="card-body">
           <p>
-            Transfer, to the account listed above, a balance of{" "}
-            <code>Ξ {this.props.balance}</code> accumulated from previous{" "}
+            Transfer, to the account above, a balance of{" "}
+            <code>Ξ {this.props.balance}</code> received from previous{" "}
             <strong>split</strong> function execution.
           </p>
-          <p>No withdraw on behalf of another account is allowed.</p>
         </span>
       </div>
     );
