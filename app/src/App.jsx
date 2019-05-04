@@ -8,7 +8,7 @@ export const App = () => (
       const { drizzle, drizzleState, initialized } = drizzleContext;
 
       if (!initialized) {
-        return "Loading (is MetaMask enabled and set on correct network?)...";
+        return "Loading... is MetaMask 🦊 enabled and set on correct network?";
       }
 
       return <SplitterApp drizzle={drizzle} drizzleState={drizzleState} />;
