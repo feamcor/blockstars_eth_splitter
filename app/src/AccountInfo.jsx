@@ -8,21 +8,25 @@ class AccountInfo extends PureComponent {
           <strong>ACCOUNT</strong> <small>{this.props.account}</small>
         </h5>
         <div className="card-body">
-          <p className="card-text">
-            <strong>Balance on blockchain: Ξ </strong>
-            {this.props.balanceAccount}
-          </p>
-          <p className="card-text">
-            <strong>Is a Pauser? </strong>
-            <span className="card-text">
-              {this.props.isPauser === true && " YES "}
-              {this.props.isPauser === false && " NO "}
-            </span>
-          </p>
-          <p className="card-text">
-            <strong>Balance on Splitter: Ξ </strong>
-            {this.props.balanceSplitter}
-          </p>
+          <table className="table table-borderless table-striped table-hover text-white bg-primary">
+            <tbody>
+              <tr>
+                <td>Balance on Blockchain</td>
+                <td>Ξ {this.props.balanceAccount}</td>
+              </tr>
+              <tr>
+                <td>Is a Pauser?</td>
+                <td>
+                  {this.props.isPauser === true && " YES "}
+                  {this.props.isPauser === false && " NO "}
+                </td>
+              </tr>
+              <tr>
+                <td>Balance on Splitter</td>
+                <td>Ξ {this.props.balanceSplitter}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     );
