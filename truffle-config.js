@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 /**
  * Use this file to configure your truffle project. It's seeded with some
  * common settings for different networks and features like migrations,
@@ -18,34 +20,23 @@
  *
  */
 
-// const HDWalletProvider = require('truffle-hdwallet-provider');
-// const infuraKey = "fj4jll3k.....";
-//
-// const fs = require('fs');
-// const mnemonic = fs.readFileSync(".secret").toString().trim();
+const HDWalletProvider = require("truffle-hdwallet-provider");
+const infuraProjectId = process.env.INFURA_PROJECT_ID;
+const mnemonic = process.env.MNEMONIC;
 
 module.exports = {
-
-  plugins: ["truffle-security"],
-
-  /**
-   * Networks define how you connect to your ethereum client and let you set the
-   * defaults web3 uses to send transactions. If you don't specify one truffle
-   * will spin up a development blockchain for you on port 9545 when you
-   * run `develop` or `test`. You can ask a truffle command to use a specific
-   * network from the command line, e.g
-   *
-   * $ truffle test --network <network-name>
-   */
-
   networks: {
     // Useful for testing. The `development` name is special - truffle uses it by default
     // if it's defined here and no other network is specified at the command line.
     // You should run a client (like ganache-cli, geth or parity) in a separate terminal
     // tab if you use this network and you must also set the `host`, `port` and `network_id`
     // options below to some value.
-
-    // ATTENTION! `development` is set at the end of this file.
+    // development == ganache-cli
+    development: {
+      host: "127.0.0.1",
+      port: 8545,
+      network_id: "*"
+    },
 
     // ganache-cli
     ganachecli: {
@@ -58,17 +49,40 @@ module.exports = {
     ganachegui: {
       host: "127.0.0.1",
       port: 7545,
-      network_id: "5777"
+      network_id: "*"
     },
 
-    // geth on private testnet
+    // geth on private local testnet
     net42: {
       host: "127.0.0.1",
       port: 8545,
       network_id: "42",
       gas: 8000000
-    }
+    },
 
+    ropsten: {
+      provider: () =>
+        new HDWalletProvider(
+          mnemonic,
+          `ropsten.infura.io/v3/${infuraProjectId}`,
+          0,
+          4
+        ),
+      network_id: 3,
+      skipDryRun: true
+    },
+
+    rinkeby: {
+      provider: () =>
+        new HDWalletProvider(
+          mnemonic,
+          `rinkeby.infura.io/v3/${infuraProjectId}`,
+          0,
+          4
+        ),
+      network_id: 4,
+      skipDryRun: true
+    }
     // Another network with more advanced options...
     // advanced: {
     // port: 8777,             // Custom port
@@ -78,7 +92,6 @@ module.exports = {
     // from: <address>,        // Account to send txs from (default: accounts[0])
     // websockets: true        // Enable EventEmitter interface for web3 (default: false)
     // },
-
     // Useful for deploying to a public network.
     // NB: It's important to wrap the provider as a function.
     // ropsten: {
@@ -89,7 +102,6 @@ module.exports = {
     // timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
     // skipDryRun: true     // Skip dry run before migrations? (default: false for public nets )
     // },
-
     // Useful for private networks
     // private: {
     // provider: () => new HDWalletProvider(mnemonic, `https://network.io`),
@@ -98,26 +110,24 @@ module.exports = {
     // }
   },
 
-  // Set default mocha options here, use special reporters etc.
   mocha: {
     enableTimeouts: true // might have to disable for public/private nets
     // timeout: 100000
   },
 
-  // Configure your compilers
   compilers: {
     solc: {
-      version: "0.5.2" // Fetch exact version from solc-bin (default: truffle's version)
+      version: "0.5.2",
       // docker: true,        // Use "0.5.1" you've installed locally with docker (default: false)
-      // settings: {          // See the solidity docs for advice about optimization and evmVersion
-      //  optimizer: {
-      //    enabled: false,
-      //    runs: 200
-      //  },
-      //  evmVersion: "byzantium"
-      // }
+      settings: {
+        // See the solidity docs for advice about optimization and evmVersion
+        optimizer: {
+          enabled: false,
+          runs: 200
+        }
+        //  evmVersion: "byzantium"
+        // }
+      }
     }
   }
 };
-
-module.exports.networks.development = module.exports.networks.ganachecli;
