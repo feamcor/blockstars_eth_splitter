@@ -4,6 +4,15 @@ import { toast } from "react-toastify";
 class Account extends Component {
   state = { txStackId: null, txStatus: null };
 
+  toastOptions = {
+    position: "top-right",
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true
+  };
+
   handleOnClick = event => {
     const txStackId = this.props.isPaused
       ? this.props.unpause.cacheSend()
@@ -19,16 +28,15 @@ class Account extends Component {
       if (txStatus !== this.state.txStatus) {
         this.setState({ txStatus });
         const message = this.props.isPaused
-          ? `UNPAUSE ... ${txStatus}`
-          : `PAUSE ... ${txStatus}`;
-        toast.info(message, {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true
-        });
+          ? `UNPAUSE: ${txStatus}`
+          : `PAUSE: ${txStatus}`;
+        if (txStatus === "pending") {
+          toast.warning(message, this.toastOptions);
+        } else if (txStatus === "success") {
+          toast.success(message, this.toastOptions);
+        } else {
+          toast.error(message, this.toastOptions);
+        }
       }
     }
   }

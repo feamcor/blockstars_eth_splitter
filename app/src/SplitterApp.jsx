@@ -7,6 +7,7 @@ import NavBar from "./NavBar";
 import AccountInfo from "./Account";
 import Withdraw from "./Withdraw";
 import SplitFunds from "./SplitFunds";
+import SplitBalance from "./SplitBalance";
 
 class SplitterApp extends Component {
   state = {
@@ -122,7 +123,14 @@ class SplitterApp extends Component {
       r_paused === null ||
       r_paused === undefined
     ) {
-      return "Loading...";
+      return (
+        <React.Fragment>
+          <NavBar
+            address={"0x0000000000000000000000000000000000000000"}
+            isPaused={false}
+          />
+        </React.Fragment>
+      );
     }
 
     const accountIsPauser = r_isPauser.value;
@@ -168,11 +176,11 @@ class SplitterApp extends Component {
 
           {!splitterIsPaused && !noBalanceAtAll && (
             <div className="row justify-content-md-center mt-3">
-              <div className="col-8">
-                <div className="input-group">
+              <div className="col-8 bg-danger">
+                <div className="input-group mt-3 mb-1">
                   <div className="input-group-prepend">
                     <span className="input-group-text" id="labelFirst">
-                      1st
+                      #1
                     </span>
                   </div>
                   <input
@@ -194,12 +202,12 @@ class SplitterApp extends Component {
           )}
 
           {!splitterIsPaused && !noBalanceAtAll && (
-            <div className="row justify-content-md-center mt-3">
-              <div className="col-8">
-                <div className="input-group">
+            <div className="row justify-content-md-center">
+              <div className="col-8 bg-danger">
+                <div className="input-group mt-1 mb-3">
                   <div className="input-group-prepend">
                     <span className="input-group-text" id="labelSecond">
-                      2nd
+                      #2
                     </span>
                   </div>
                   <input
@@ -220,22 +228,35 @@ class SplitterApp extends Component {
             </div>
           )}
 
-          {!splitterIsPaused && !noBalance && (
-            <div className="row justify-content-md-center mt-3">
-              <div className="col-8">
+          <div className="row justify-content-md-center mt-3">
+            {!splitterIsPaused && !noBalance && (
+              <div className="col-6">
                 <SplitFunds
                   split={methods.split}
                   getTxStatus={this.getTxStatus}
                   toWei={this.props.drizzle.web3.utils.toWei}
+                  isAddress={this.props.drizzle.web3.utils.isAddress}
                   isPaused={splitterIsPaused}
-                  account={account}
                   balance={this.fromWeiToEther(accountBalance)}
                   first={this.state.firstRecipient}
                   second={this.state.secondRecipient}
                 />
               </div>
-            </div>
-          )}
+            )}
+
+            {!splitterIsPaused && !noBalanceOnSplitter && (
+              <div className="col-6">
+                <SplitBalance
+                  split={methods.splitBalance}
+                  getTxStatus={this.getTxStatus}
+                  isAddress={this.props.drizzle.web3.utils.isAddress}
+                  isPaused={splitterIsPaused}
+                  first={this.state.firstRecipient}
+                  second={this.state.secondRecipient}
+                />
+              </div>
+            )}
+          </div>
         </div>
       </React.Fragment>
     );
