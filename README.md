@@ -122,7 +122,17 @@ $ npx truffle compile
 12. You should see similar output as below.
 
 ```
-TO-DO <paste output here>
+Compiling your contracts...
+===========================
+> Compiling ./contracts/Migrations.sol
+> Compiling ./contracts/Splitter.sol
+> Compiling openzeppelin-solidity/contracts/access/Roles.sol
+> Compiling openzeppelin-solidity/contracts/access/roles/PauserRole.sol
+> Compiling openzeppelin-solidity/contracts/lifecycle/Pausable.sol
+> Compiling openzeppelin-solidity/contracts/math/SafeMath.sol
+> Artifacts written to /Users/feamcor/Documents/Repositories/blockstars_eth_splitter/build/contracts
+> Compiled successfully using:
+   - solc: 0.5.8+commit.23d335f2.Emscripten.clang
 ```
 
 13. Open another terminal window, go to the same directory `blockstars_eth_splitter` and run Ganache CLI.
@@ -134,7 +144,48 @@ $ npx ganache-cli
 14. You should see similar output as below.
 
 ```
-TO-DO <paste output here>
+Ganache CLI v6.4.3 (ganache-core: 2.5.5)
+
+Available Accounts
+==================
+(0) 0xce1f8ca86aa922c93f4b6d82776152197cad2e87 (~100 ETH)
+(1) 0x3405838da07ec055fa2b0b3552a764503826c1d3 (~100 ETH)
+(2) 0x105f5e2e9f778ad73555a220ec52557c192b05db (~100 ETH)
+(3) 0x08cadbe9298eda485770733b29431062513178fc (~100 ETH)
+(4) 0x7ec4993432903205474e6804e55d05dda552e34c (~100 ETH)
+(5) 0xa7f53f84b772d517af4c98fa8ca10dfec5c02026 (~100 ETH)
+(6) 0x508688b55e567c36de9bf881f60df1108ffb0f64 (~100 ETH)
+(7) 0x511957f2544b84c9bc09b2f6d14e0b7c932f31b0 (~100 ETH)
+(8) 0x2c34f8ad86c7a910fd386c947b0c72a8aed4a97e (~100 ETH)
+(9) 0x36b70534d0f3ab7c87c54d917e6cae6b8389c3c0 (~100 ETH)
+
+Private Keys
+==================
+(0) 0xd2d02a9b0869622e53783a1e37428aa9c4b3bf008925de2ffa07446afd1bc681
+(1) 0x37034d1773add474602bef7b12edd683341c728c32544d4b1b28a6b1a697b721
+(2) 0xd8eb286bb5d3c3cd859ea76ee91bebd9fdc28e67fb6758e245c124710a427676
+(3) 0x6d7bc75fce3283b9544f625349f2171dc5c30eaa59c5c044ca6aee90d10e6f8e
+(4) 0x67841b242797916395f758428132103ffc7cd63853e40e9862d14db295abe432
+(5) 0x25866c04b05569b84916bccd92609c400118a8a90aba27ee3a955e8840aba871
+(6) 0xd4b1fa2a8509a3a056debd9b71965e17dff60a4c39c88c1ed6889dc658b7d673
+(7) 0xa55715c8ef3b7710b928eeefa05077968c9d63fbec393169d161903f101fa3e8
+(8) 0x891cd6255dd1ba440c73085e4947ac54b535b69ddb039becd36ae563be530e2f
+(9) 0xb760bb6d188765185ec80c0638367c544215ca9af3fc02e591ee9e64f9a84bf8
+
+HD Wallet
+==================
+Mnemonic:      wealth remove team hammer stamp shove blossom truth quantum library sugar glove
+Base HD Path:  m/44'/60'/0'/0/{account_index}
+
+Gas Price
+==================
+20000000000
+
+Gas Limit
+==================
+6721975
+
+Listening on 127.0.0.1:8545
 ```
 
 15. Keep the current terminal window open and switch back to the first terminal window.
@@ -147,7 +198,70 @@ $ npx truffle migrate
 17. You should see similar output as below.
 
 ```
-TO-DO <paste output here>
+Compiling your contracts...
+===========================
+> Everything is up to date, there is nothing to compile.
+
+
+Starting migrations...
+======================
+> Network name:    'development'
+> Network id:      1557014636463
+> Block gas limit: 0x6691b7
+
+
+1_initial_migration.js
+======================
+
+   Deploying 'Migrations'
+   ----------------------
+   > transaction hash:    0xc71725a607ac200f5684c288b3c5457dc30ba1945ab27ed242454e05e0061a6b
+   > Blocks: 0            Seconds: 0
+   > contract address:    0x09c64bfA52726A900387acb7007780bE3977C1fB
+   > block number:        1
+   > block timestamp:     1557014696
+   > account:             0xCe1F8ca86Aa922C93F4B6d82776152197CaD2E87
+   > balance:             99.99453676
+   > gas used:            273162
+   > gas price:           20 gwei
+   > value sent:          0 ETH
+   > total cost:          0.00546324 ETH
+
+
+   > Saving migration to chain.
+   > Saving artifacts
+   -------------------------------------
+   > Total cost:          0.00546324 ETH
+
+
+2_deploy_contracts.js
+=====================
+
+   Deploying 'Splitter'
+   --------------------
+   > transaction hash:    0x939772260166e63a0fc1f855e1db087a54943fa5d6b2a930e75f5fcd10c2d9b9
+   > Blocks: 0            Seconds: 0
+   > contract address:    0x0A538fF26DB5e177Fa49B1EbF26d21CE05c900Bc
+   > block number:        3
+   > block timestamp:     1557014696
+   > account:             0xCe1F8ca86Aa922C93F4B6d82776152197CaD2E87
+   > balance:             99.96456572
+   > gas used:            1456524
+   > gas price:           20 gwei
+   > value sent:          0 ETH
+   > total cost:          0.02913048 ETH
+
+
+   > Saving migration to chain.
+   > Saving artifacts
+   -------------------------------------
+   > Total cost:          0.02913048 ETH
+
+
+Summary
+=======
+> Total deployments:   2
+> Final cost:          0.03459372 ETH
 ```
 
 18. Run the test script.
@@ -159,8 +273,54 @@ $ npx truffle test
 19. You should see similar output as below.
 
 ```
-TO-DO <paste output here>
-```
+Using network 'development'.
+
+
+Compiling your contracts...
+===========================
+> Compiling ./test/TestSplitter.sol
+> Compiling ./test/helpers/Actor.sol
+> Artifacts written to /var/folders/70/018k677x11q6x923vdv0kvwm0000gn/T/test-11944-3716-ufj4cw.u8nmj
+> Compiled successfully using:
+   - solc: 0.5.8+commit.23d335f2.Emscripten.clang
+
+
+
+  TestSplitter
+    ✓ testDeployed (80ms)
+    ✓ testContractAccounts (208ms)
+
+  Function: constructor
+    ✓ should have deployer as pauser
+    ✓ should have initial balance of zero
+
+  Function: fallback
+    ✓ should revert on fallback (51ms)
+
+  Function: split
+    ✓ should revert when split transfer value is zero (63ms)
+    ✓ should revert when any recipient is empty (196ms)
+    ✓ should revert when recipient is duplicated (43ms)
+    ✓ should revert when sender is a recipient (103ms)
+    ✓ should split transferred funds (104ms)
+    ✓ should split transferred funds and remainder goes to 1st recipient (107ms)
+
+  Function: splitBalance
+    ✓ should revert when split balance is zero
+    ✓ should revert when any recipient is empty (119ms)
+    ✓ should revert when recipient is duplicated (49ms)
+    ✓ should revert when sender is a recipient (75ms)
+    ✓ should split balance (120ms)
+    ✓ should split balance and remainder stay with sender (129ms)
+
+  Function: withdraw
+    ✓ should allow recipients to withdraw (171ms)
+    ✓ should revert when recipient balance is zero
+    ✓ should revert when non-recipient withdraw (65ms)
+
+
+  20 passing (10s)
+  ```
 
 20. **Congratulations!** You have the **Splitter** smart contract running on your machine. This is a typical set-up for development and testing.
 
@@ -194,13 +354,22 @@ $ npm start
 6. You should see similar output as below. Also, your default browser should open on the URL listed below.
 
 ```
-TO-DO <paste output here>
+Compiled successfully!
+
+You can now view splitter-app in the browser.
+
+  Local:            http://localhost:3000/
+  On Your Network:  http://10.0.1.15:3000/
+
+Note that the development build is not optimized.
+To create a production build, use npm run build.
 ```
 
-7. MetaMask should ask for authorization to connect the DApp to your account. Press `connect` to proceed.
+7. After you import a few of the Ganache accounts to MetaMask, the latter should ask for authorization to connect the DApp to your account. Press `connect` to proceed.
    ![MetaMask connect dapp to account](screenshot_1.png)
 
-8. The **Splitter** DApp is loaded and ready to be used.
+8. The **Splitter** DApp is loaded and ready to be used. You certainly will see different screen than the example below which shows an account which current state all it to perform all operations: pause/unpause, split funds, split balance and withdraw. 
+
    ![Splitter DApp](screenshot_2.png)
 
 9. **Congratulations!** Now you can use the **Splitter** DApp to split funds between two recipient accounts. You should have at least 3 accounts in MetaMask in order to play with the different roles that an account assume: pauser, funds donor and funds recipient. Enjoy!
@@ -218,10 +387,30 @@ $ npm run build
 4. You should see similar output as below.
 
 ```
-TO-DO <paste output here>
+> splitter-app@0.1.0 build /Users/feamcor/Documents/Repositories/blockstars_eth_splitter/app
+> react-scripts build
+
+Creating an optimized production build...
+Compiled successfully.
+
+File sizes after gzip:
+
+  374.7 KB  build/static/js/2.24d0748d.chunk.js
+  23.9 KB   build/static/css/2.4915e3e5.chunk.css
+  20.13 KB  build/static/js/main.6464b07a.chunk.js
+  786 B     build/static/js/runtime~main.ccec420f.js
+
+The project was built assuming it is hosted at ./.
+You can control this with the homepage field in your package.json.
+
+The build folder is ready to be deployed.
+
+Find out more about deployment here:
+
+  https://bit.ly/CRA-deploy
 ```
 
-5. For running the production build, first you need to install a static server.
+1. For running the production build, first you need to install a static server. Below is just one option, choose whatever is best to your environment or of your choice.
 
 ```bash
 $ npm install serve --save
@@ -236,11 +425,20 @@ $ npx serve -s build
 7. You should see similar output as below.
 
 ```
-TO-DO <paste output here>
+   ┌───────────────────────────────────────────────┐
+   │                                               │
+   │   Serving!                                    │
+   │                                               │
+   │   - Local:            http://localhost:5000   │
+   │   - On Your Network:  http://10.0.1.15:5000   │
+   │                                               │
+   │   Copied local address to clipboard!          │
+   │                                               │
+   └───────────────────────────────────────────────┘
 ```
 
-8. To interrupt the server, press `ctrl-c`
-9. **Congratulations!** Now you can use the production build of the **Splitter** DApp. Enjoy!
+1. To interrupt the server, press `ctrl-c`
+2. **Congratulations!** Now you can use the production build of the **Splitter** DApp. Enjoy!
 
 ## LIVE APP ON <ROPSTEN/RINKEBY>
 
