@@ -64,7 +64,7 @@ module.exports = {
       provider: () =>
         new HDWalletProvider(
           mnemonic,
-          `ropsten.infura.io/v3/${infuraProjectId}`,
+          `https://ropsten.infura.io/v3/${infuraProjectId}`,
           0,
           4
         ),
@@ -76,7 +76,7 @@ module.exports = {
       provider: () =>
         new HDWalletProvider(
           mnemonic,
-          `rinkeby.infura.io/v3/${infuraProjectId}`,
+          `https://rinkeby.infura.io/v3/${infuraProjectId}`,
           0,
           4
         ),
