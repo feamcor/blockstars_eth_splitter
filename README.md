@@ -104,8 +104,11 @@ $ cd blockstars_eth_splitter
 
 7.  The `truffle-config.js` is configured for the following networks:
 
-    - `development` and `ganachecli` using port 8545;
-    - `ganachegui` using port 7545;
+    - `development` and `ganachecli` using port 8545
+    - `ganachegui` using port 7545
+    - `ropsten` and `rinkeby` using Infura API. For such networks, you need to sign up and create a project on Infura in order to get its Project ID. Also, you need to create a `.env` file with the following entries:
+      - `INFURA_PROJECT_ID="<your infura project id>"`
+      - `MNEMONIC="<your wallet seed words>"`
 
 8.  Install the project dependencies (e.g. truffle, ganache-cli, etc.).
 
