@@ -443,6 +443,58 @@ $ npx serve -s build
 1. To interrupt the server, press `ctrl-c`
 2. **Congratulations!** Now you can use the production build of the **Splitter** DApp. Enjoy!
 
-## LIVE APP ON <ROPSTEN/RINKEBY>
+## LIVE APP ON TESTNET
 
-- TO-DO
+### Ropsten
+You can check [Etherscan](https://ropsten.etherscan.io/) for the [transaction](https://ropsten.etherscan.io/tx/0x046ada724dc3a73b492ea77ab78025f357bf59bc0743c53b85de9e3b7695af06) and the [contract](https://ropsten.etherscan.io/address/0x0A1C199134DBdcDCA6e610977CE8ebC728A24cEF) deployed on Ropsten. 
+
+```
+$ npx truffle migrate --network ropsten
+
+   Deploying 'Splitter'
+   --------------------
+   > transaction hash:    0x046ada724dc3a73b492ea77ab78025f357bf59bc0743c53b85de9e3b7695af06
+   > Blocks: 2            Seconds: 28
+   > contract address:    0x0A1C199134DBdcDCA6e610977CE8ebC728A24cEF
+   > block number:        5536000
+   > block timestamp:     1557020227
+   > account:             0xF1BD9268d37D9dbc748b8D0a8556F72d1b331E02
+   > balance:             2.9575377922
+   > gas used:            1456524
+   > gas price:           20 gwei
+   > value sent:          0 ETH
+   > total cost:          0.02913048 ETH
+
+
+   > Saving migration to chain.
+   > Saving artifacts
+   -------------------------------------
+   > Total cost:          0.02913048 ETH
+```
+
+### Rinkeby
+You can check [Etherscan](https://rinkeby.etherscan.io/) for the [transaction](https://rinkeby.etherscan.io/tx/0x2d3f5f9df95ea8bcb6d89ad77a752f9a9ab674735209676dba35f1480f82a861) and the [contract](https://rinkeby.etherscan.io/address/0x8211AcE10D119D748Fae8F3b9857Adba7FE72542) deployed on Rinkeby. 
+
+```
+$ npx truffle migrate --network rinkeby
+
+   Deploying 'Splitter'
+   --------------------
+   > transaction hash:    0x2d3f5f9df95ea8bcb6d89ad77a752f9a9ab674735209676dba35f1480f82a861
+   > Blocks: 0            Seconds: 8
+   > contract address:    0x8211AcE10D119D748Fae8F3b9857Adba7FE72542
+   > block number:        4326061
+   > block timestamp:     1557020370
+   > account:             0xF1BD9268d37D9dbc748b8D0a8556F72d1b331E02
+   > balance:             0.953358784
+   > gas used:            1456524
+   > gas price:           20 gwei
+   > value sent:          0 ETH
+   > total cost:          0.02913048 ETH
+
+
+   > Saving migration to chain.
+   > Saving artifacts
+   -------------------------------------
+   > Total cost:          0.02913048 ETH
+```
