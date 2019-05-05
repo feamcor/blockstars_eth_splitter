@@ -91,3 +91,9 @@ build/mythx
 
 # IDE files
 *.code-workspace
+
+# macOS
+.DS_Store
+
+# Ignore React build for this project
+app/build
