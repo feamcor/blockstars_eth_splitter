@@ -6,7 +6,7 @@
   "bugs": {
     "url": "https://github.com/feamcor/blockstars_eth_splitter/issues"
   },
-  "homepage": "https://github.com/feamcor/blockstars_eth_splitter#readme",
+  "homepage": ".",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/feamcor/blockstars_eth_splitter.git"
