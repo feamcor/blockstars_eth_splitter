@@ -4,7 +4,7 @@ const { toBN, toWei } = web3.utils;
 const { getBalance } = web3.eth;
 const Splitter = artifacts.require("Splitter");
 
-contract("Splitter", async accounts => {
+contract("Splitter", accounts => {
   const BN_0 = toBN("0");
   const BN_1GW = toBN(toWei("1", "gwei"));
   const BN_HGW = toBN(toWei("0.5", "gwei"));
@@ -12,9 +12,13 @@ contract("Splitter", async accounts => {
 
   const [ALICE, BOB, CAROL, SOMEONE] = accounts;
 
-  const SPLITTER = await Splitter.deployed();
+  let SPLITTER;
 
-  describe("Function: constructor", async () => {
+  before("Initialization", async () => {
+    SPLITTER = await Splitter.deployed();
+  });
+
+  describe("Function: constructor", () => {
     it("should have deployer as pauser", async () => {
       const isPauser = await SPLITTER.isPauser(ALICE, { from: ALICE });
       assert.isTrue(isPauser, "deployer is not pauser");
@@ -26,13 +30,13 @@ contract("Splitter", async accounts => {
     });
   });
 
-  describe("Function: fallback", async () => {
+  describe("Function: fallback", () => {
     it("should revert on fallback", async () => {
       await reverts(SPLITTER.sendTransaction({ from: ALICE, value: BN_1GW }));
     });
   });
 
-  describe("Function: split", async () => {
+  describe("Function: split", () => {
     it("should revert when split transfer value is zero", async () => {
       await reverts(
         SPLITTER.split(BOB, CAROL, { from: ALICE, value: BN_0 }),
@@ -146,7 +150,7 @@ contract("Splitter", async accounts => {
     });
   });
 
-  describe("Function: splitBalance", async () => {
+  describe("Function: splitBalance", () => {
     it("should revert when split balance is zero", async () => {
       await reverts(
         SPLITTER.splitBalance(BOB, CAROL, { from: SOMEONE }),
@@ -254,7 +258,7 @@ contract("Splitter", async accounts => {
     });
   });
 
-  describe("Function: withdraw", async () => {
+  describe("Function: withdraw", () => {
     it("should allow recipients to withdraw", async () => {
       await SPLITTER.splitBalance(BOB, CAROL, { from: ALICE });
 
