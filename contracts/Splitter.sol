@@ -47,9 +47,9 @@ contract Splitter is Pausable {
         require(msg.value != uint(0), "value is zero");
         uint _value2nd = msg.value.div(2);
         uint _value1st = _value2nd.add(msg.value.mod(2));
+        emit FundsSplitted(msg.sender, _first, _second, _value1st, _value2nd);
         balances[_second] = balances[_second].add(_value2nd);
         balances[_first] = balances[_first].add(_value1st);
-        emit FundsSplitted(msg.sender, _first, _second, _value1st, _value2nd);
     }
 
     /// @notice Split sender's balance between recipient accounts.
@@ -65,10 +65,10 @@ contract Splitter is Pausable {
         uint _balance = balances[msg.sender];
         require(_balance != uint(0), "balance is zero");
         uint _value = _balance.div(2);
+        emit BalanceSplitted(msg.sender, _first, _second, _value);
         balances[msg.sender] = _balance.mod(2);
         balances[_second] = balances[_second].add(_value);
         balances[_first] = balances[_first].add(_value);
-        emit BalanceSplitted(msg.sender, _first, _second, _value);
     }
 
     /// @notice Withdraw recipient accumulated balance.
@@ -76,8 +76,8 @@ contract Splitter is Pausable {
     function withdraw() external whenNotPaused {
         uint _balance = balances[msg.sender];
         require(_balance != uint(0), "balance is zero");
+        emit BalanceWithdrew(msg.sender, _balance);
         balances[msg.sender] = uint(0);
         msg.sender.transfer(_balance);
-        emit BalanceWithdrew(msg.sender, _balance);
     }
 }
