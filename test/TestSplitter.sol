@@ -5,12 +5,12 @@ import "truffle/DeployedAddresses.sol";
 import "../contracts/Splitter.sol";
 import "./helpers/Actor.sol";
 
-contract TestSplitter {  
+contract TestSplitter {
     uint public initialBalance = 1 ether;
 
     function testDeployed() public {
         Splitter _splitter = Splitter(DeployedAddresses.Splitter());
-        Assert.balanceIsZero(address(_splitter), "initial balance is not zero");   
+        Assert.balanceIsZero(address(_splitter), "initial balance is not zero");
     }
 
     function testContractAccounts() public {

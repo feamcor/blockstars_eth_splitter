@@ -9,7 +9,7 @@ contract Actor {
     function() external payable {
         emit FundsReceived(msg.sender, msg.value);
     }
- 
+
     function split(Splitter _splitter, uint _value, address _first, address _second) public {
         require(address(_splitter) != address(0x0), "splitter is empty");
         require(_value != uint(0), "value to split is zero");
